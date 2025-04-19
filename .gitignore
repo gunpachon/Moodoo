@@ -55,7 +55,7 @@ venv/
 # Environment
 .env
 
-# DB / Cache / Logs
+# DB / Logs
 *.log
 
 # Swagger
