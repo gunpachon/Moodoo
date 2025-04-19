@@ -1,0 +1,36 @@
+tags:
+  - Auth
+summary: Register a new user
+description: Sign up with username, password, and nickname
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - in: body
+    name: user
+    description: User signup details
+    required: true
+    schema:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: johndoe
+        password:
+          type: string
+          example: secret123
+        nickname:
+          type: string
+          example: John
+responses:
+  201:
+    description: User created successfully
+  400:
+    description: Missing username or password
+  409:
+    description: Username already exists
+
