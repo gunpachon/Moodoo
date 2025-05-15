@@ -1,5 +1,5 @@
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { Image, StyleProp, View, ViewProps, ViewStyle } from "react-native";
+import { cssInterop } from "nativewind";
+import { StyleProp, ViewStyle } from "react-native";
 import Svg, { SvgProps, Path, G, Circle } from "react-native-svg";
 
 interface MoodProps extends SvgProps {
@@ -76,6 +76,15 @@ const Moods = [Mood1, Mood2, Mood3, Mood4, Mood5];
 
 type MoodNumber = 1 | 2 | 3 | 4 | 5;
 
+const CircleWind = cssInterop(Circle, {
+  className: {
+    target: false,
+    nativeStyleToProp: {
+      color: "fill",
+    },
+  },
+});
+
 export function MoodFace({
   mood,
   size = 64,
@@ -85,12 +94,16 @@ export function MoodFace({
   size?: number;
   style?: StyleProp<ViewStyle>;
 }) {
-  const iconColor = useThemeColor("icon");
-
   if (mood === null || mood === undefined) {
     return (
       <Svg width={size} height={size} viewBox="0 0 96 96" fill="none">
-        <Circle cx="48" cy="48" r="48" fill={iconColor} opacity={0.5} />
+        <CircleWind
+          cx="48"
+          cy="48"
+          r="48"
+          className="text-base-content"
+          opacity={0.2}
+        />
       </Svg>
     );
   } else {

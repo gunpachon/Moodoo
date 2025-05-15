@@ -1,19 +1,15 @@
 import { Pressable, type PressableProps } from "react-native";
+import { twMerge } from "tailwind-merge";
 
 export function PressableWithOpacity({
-  style: originalStyle,
+  style,
+  className,
   ...rest
 }: PressableProps) {
   return (
     <Pressable
-      style={(state) => [
-        {
-          opacity: state.pressed ? 0.6 : 1,
-        },
-        typeof originalStyle === "function"
-          ? originalStyle(state)
-          : originalStyle,
-      ]}
+      style={style}
+      className={twMerge("active:opacity-60", className)}
       {...rest}
     />
   );

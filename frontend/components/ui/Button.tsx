@@ -6,53 +6,42 @@ import {
   PressableProps,
 } from "react-native";
 import { IconSymbol, type IconSymbolName } from "./IconSymbol";
-import { ColorName, useThemeColor } from "@/hooks/useThemeColor";
+import { twMerge } from "tailwind-merge";
 
 interface Props extends PressableProps {
   iconName?: IconSymbolName;
   title: string;
-  style?: StyleProp<ViewStyle>;
   iconEnd?: boolean;
-  colorName?: ColorName;
+  contentClassName?: string;
 }
 
 export function Button({
   iconName,
   title,
-  style,
+  className,
+  contentClassName,
   iconEnd = false,
-  colorName = "tint",
   ...rest
 }: Props) {
-  const tintColor = useThemeColor(colorName);
-
   function Icon(iconName: IconSymbolName) {
-    return <IconSymbol name={iconName} color={tintColor} size={20} />;
+    return (
+      <IconSymbol
+        name={iconName}
+        className={twMerge("text-primary size-5", contentClassName)}
+      />
+    );
   }
 
   return (
     <Pressable
-      style={({ pressed }) => [
-        {
-          opacity: pressed ? 0.5 : 1,
-        },
-        {
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 4,
-        },
-        style,
-      ]}
+      className={twMerge(
+        "active:opacity-50 flex-row items-center gap-1",
+        className,
+      )}
       {...rest}
     >
       {!iconEnd && iconName && Icon(iconName)}
-      <Text
-        style={{
-          color: tintColor,
-          fontWeight: "600",
-          fontSize: 16,
-        }}
-      >
+      <Text className={twMerge("text-primary font-semibold", contentClassName)}>
         {title}
       </Text>
       {iconEnd && iconName && Icon(iconName)}

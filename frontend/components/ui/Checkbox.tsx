@@ -1,19 +1,18 @@
+import { twMerge } from "tailwind-merge";
 import { IconSymbol } from "./IconSymbol";
-import { useThemeColor } from "@/hooks/useThemeColor";
 
 interface Props {
   size?: number;
   checked: boolean;
 }
 
-export function Checkbox({ size = 26, checked }: Props) {
-  const tintColor = useThemeColor("tint");
-  const uncheckedColor = useThemeColor("icon");
-
+export function Checkbox({ checked }: Props) {
   return (
     <IconSymbol
-      color={checked ? tintColor : uncheckedColor}
-      size={size}
+      className={twMerge(
+        checked ? "text-primary" : "text-base-content",
+        "size-6",
+      )}
       name={checked ? "checkmark.circle.fill" : "circle"}
     />
   );

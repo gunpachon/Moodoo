@@ -2,6 +2,7 @@
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { SymbolWeight } from "expo-symbols";
+import { cssInterop } from "nativewind";
 import React from "react";
 import { OpaqueColorValue, StyleProp, View, ViewStyle } from "react-native";
 
@@ -30,6 +31,16 @@ const MAPPING = {
 
 export type IconSymbolName = keyof typeof MAPPING;
 
+cssInterop(MaterialCommunityIcons, {
+  className: {
+    target: false,
+    nativeStyleToProp: {
+      width: "size",
+      color: "color",
+    },
+  },
+});
+
 /**
  * An icon component that uses native SFSymbols on iOS, and MaterialIcons on Android and web. This ensures a consistent look across platforms, and optimal resource usage.
  *
@@ -37,20 +48,27 @@ export type IconSymbolName = keyof typeof MAPPING;
  */
 export function IconSymbol({
   name,
-  size = 24,
-  color,
   style,
+  color,
+  size,
   weight,
+  className,
 }: {
   name: IconSymbolName;
   size?: number;
-  color: string | OpaqueColorValue;
+  color?: string;
   style?: StyleProp<ViewStyle>;
   weight?: SymbolWeight;
+  className?: string;
 }) {
   return (
-    <View style={style}>
-      <MaterialCommunityIcons color={color} size={size} name={MAPPING[name]} />
+    <View style={style} className={className}>
+      <MaterialCommunityIcons
+        size={size}
+        color={color}
+        className={className}
+        name={MAPPING[name]}
+      />
     </View>
   );
 }

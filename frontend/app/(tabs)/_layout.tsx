@@ -1,15 +1,20 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, useColorScheme } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { themes } from "@/constants/Themes";
+
+import { vars } from "nativewind";
 
 export default function TabLayout() {
-  const tintColor = useThemeColor("tint");
-  const backgroundColor = useThemeColor("background");
+  const colorScheme = useColorScheme();
+
+  const theme = themes[colorScheme ?? "light"];
+
+  const tintColor = theme["--color-primary"];
 
   return (
     <Tabs
@@ -25,9 +30,10 @@ export default function TabLayout() {
           },
           default: {},
         }),
-        sceneStyle: {
-          backgroundColor,
-        },
+        sceneStyle: [
+          vars(theme),
+          { backgroundColor: theme["--color-base-100"] },
+        ],
       }}
     >
       <Tabs.Screen
@@ -35,7 +41,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <IconSymbol size={24} name="house.fill" color={color} />
           ),
         }}
       />
@@ -44,7 +50,7 @@ export default function TabLayout() {
         options={{
           title: "Calendar",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="calendar" color={color} />
+            <IconSymbol size={24} name="calendar" color={color} />
           ),
         }}
       />
@@ -53,7 +59,7 @@ export default function TabLayout() {
         options={{
           title: "Insights",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="chart.bar.xaxis" color={color} />
+            <IconSymbol size={24} name="chart.bar.xaxis" color={color} />
           ),
         }}
       />

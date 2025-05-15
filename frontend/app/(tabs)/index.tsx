@@ -1,41 +1,34 @@
-import { Platform, Pressable } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 
-import { ThemedText } from "@/components/ThemedText";
 import { Button } from "@/components/ui/Button";
-import { ThemedView } from "@/components/ThemedView";
 import { useState } from "react";
-import { useThemeColor } from "@/hooks/useThemeColor";
 import { PressableWithOpacity } from "@/components/PressableWithOpacity";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { MoodFace } from "@/components/ui/MoodFace";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 
 import { getCalendars } from "expo-localization";
 
-function ChallengeCheckbox({ challenge }: { challenge: string }) {
-  const [checked, setChecked] = useState(false);
-
+function ChallengeCheckbox({
+  challenge,
+  checked,
+  onCheck,
+}: {
+  challenge: string;
+  checked: boolean;
+  onCheck: (checked: boolean) => void;
+}) {
   return (
     <PressableWithOpacity
-      style={{
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-      }}
+      className="px-3 py-2.5"
       onPress={() => {
-        setChecked(!checked);
+        onCheck(!checked);
       }}
     >
-      <ThemedView
-        style={{
-          flexDirection: "row",
-          gap: 8,
-          alignItems: "center",
-        }}
-      >
+      <View className="flex-row gap-2 items-center">
         <Checkbox checked={checked} />
-        <ThemedText type="default">{challenge}</ThemedText>
-      </ThemedView>
+        <Text className="text-base-content">{challenge}</Text>
+      </View>
     </PressableWithOpacity>
   );
 }
@@ -45,12 +38,18 @@ interface Mood {
   description: string[];
 }
 
-export default function HomeScreen() {
-  const topPadding = useSafeAreaInsets().top;
-  const iconColor = useThemeColor("icon");
+interface Challenge {
+  id: number;
+  text: string;
+  checked: boolean;
+}
 
-  const [recordedToday, setRecordedToday] = useState(false);
+export default function HomeScreen() {
   const [mood, setMood] = useState<Mood | undefined>();
+  const [challenges, setChallenges] = useState<Challenge[]>([
+    { id: 1, text: "Exercise", checked: false },
+    { id: 2, text: "Stay hydrated", checked: false },
+  ]);
 
   const calendar = getCalendars()[0];
 
@@ -61,95 +60,45 @@ export default function HomeScreen() {
   const todayText = format.format(new Date());
 
   return (
-    <ThemedView
-      style={{
-        paddingHorizontal: 32,
-        paddingTop: topPadding + 16,
-        paddingBottom: 16,
-        gap: 16,
-      }}
-    >
-      <ThemedView
-        style={{
-          marginBottom: 12,
-        }}
-      >
-        <ThemedText type="subtitle">What's up, Ideal!</ThemedText>
-      </ThemedView>
-      <ThemedView>
-        <ThemedText type="subtitle" style={{ marginBottom: 8 }}>
+    <View className="px-8 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 gap-4">
+      <View className="mb-3">
+        <Text className="text-base-content text-xl font-bold">
+          What's up, Ideal!
+        </Text>
+      </View>
+      <View>
+        <Text className="text-base-content text-xl font-bold mb-2">
           Today's mood
-        </ThemedText>
-        <ThemedView
-          backgroundColor="card"
-          style={{
-            borderRadius: 8,
-            justifyContent: "center",
-            alignItems: "center",
-            height: 100,
-          }}
-        >
+        </Text>
+        <View className="bg-base-200 rounded-md justify-center items-center h-28">
           {mood !== undefined ? (
-            <Pressable
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.7 : 1,
-                // backgroundColor: "#F00",
-                padding: 24,
-                paddingEnd: 36,
-                width: "100%",
-                height: "100%",
-                justifyContent: "center",
-              })}
-            >
+            <Pressable className="opacity-100 active:opacity-70 p-6 pr-9 w-full h-full justify-center">
               <IconSymbol
-                color={iconColor}
-                size={Platform.select({
-                  ios: 16,
-                  android: 24,
-                })}
                 name="chevron.right"
-                style={{
-                  position: "absolute",
-                  end: Platform.select({
-                    android: 12,
-                    ios: 16,
-                  }),
-                }}
+                weight="semibold"
+                className="absolute end-4 android:end-3 text-base-content opacity-50 size-4 android:size-5"
               />
-              <ThemedView
-                style={{
-                  gap: 16,
-                  width: "100%",
-                  height: "100%",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
+              <View className="gap-4 w-full h-full flex-row items-center">
                 <MoodFace mood={mood.number} size={52} />
-                <ThemedView
-                  style={{
-                    flexShrink: 1,
-                    alignItems: "flex-start",
-                    // backgroundColor: "#F00",
-                  }}
-                >
-                  <ThemedText type="defaultSemiBold">{todayText}</ThemedText>
-                  <ThemedText>{mood.description.join(", ")}</ThemedText>
-                </ThemedView>
-              </ThemedView>
+                <View className="shrink items-start">
+                  <Text className="text-base-content text-lg font-bold">
+                    {todayText}
+                  </Text>
+                  <Text className="text-base-content font-medium">
+                    {mood.description.join(", ")}
+                  </Text>
+                </View>
+              </View>
             </Pressable>
           ) : (
-            <ThemedView
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <ThemedText>Not recorded yet</ThemedText>
+            <View className="items-center justify-center">
+              <Text className="text-base-content text-lg">
+                Not recorded yet
+              </Text>
               <Button
                 title="Record mood"
                 iconName="square.and.pencil"
-                style={{ padding: 8 }}
+                className="p-2"
                 onPress={() =>
                   setMood({
                     number: 4,
@@ -157,41 +106,42 @@ export default function HomeScreen() {
                   })
                 }
               ></Button>
-            </ThemedView>
+            </View>
           )}
-        </ThemedView>
-      </ThemedView>
-      <ThemedView>
-        <ThemedText type="subtitle" style={{ marginTop: 16, marginBottom: 8 }}>
+        </View>
+      </View>
+      <View className="pt-4">
+        <Text className="text-base-content text-xl font-bold pb-2">
           Challenges
-        </ThemedText>
-        <ThemedView
-          backgroundColor="card"
-          style={{
-            borderRadius: 8,
-            justifyContent: "flex-start",
-            alignItems: "stretch",
-            paddingHorizontal: 8,
-            paddingVertical: 12,
-            // paddingHorizontal: 24,
-            // paddingVertical: 20,
-            gap: 4,
-          }}
-        >
-          <ChallengeCheckbox challenge="Abc" />
-          <ChallengeCheckbox challenge="defg" />
+        </Text>
+        <View className="bg-base-200 rounded-md justify-start items-stretch px-2 py-3 gap-1">
+          {challenges.map((challenge, i) => (
+            <ChallengeCheckbox
+              challenge={challenge.text}
+              checked={challenge.checked}
+              onCheck={(checked) => {
+                setChallenges(
+                  challenges.map((c) => {
+                    if (c.id == challenge.id) {
+                      return { ...c, checked };
+                    } else {
+                      return c;
+                    }
+                  }),
+                );
+              }}
+              key={challenge.id}
+            />
+          ))}
+
           <Button
             title="Add challenge"
             iconName="plus"
-            colorName="subtext"
-            style={{
-              paddingHorizontal: 14,
-              paddingVertical: 8,
-              gap: 8,
-            }}
+            className="px-3.5 py-2 gap-2.5"
+            contentClassName="text-base-content opacity-70"
           ></Button>
-        </ThemedView>
-      </ThemedView>
-    </ThemedView>
+        </View>
+      </View>
+    </View>
   );
 }
