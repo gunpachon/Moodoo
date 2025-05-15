@@ -38,5 +38,10 @@ def create_app():
     from app.routes.login import login_bp
     app.register_blueprint(login_bp, url_prefix='/api')
 
+    from app.routes.user import user_bp
+    app.register_blueprint(user_bp, url_prefix='/api')
+    
+    from app.routes.mood import mood_bp
+    app.register_blueprint(mood_bp, url_prefix='/api')
 
     return app

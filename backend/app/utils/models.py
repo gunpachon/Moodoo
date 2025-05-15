@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from sqlalchemy import JSON
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -25,8 +26,8 @@ class Mood(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     mood_level = db.Column(db.Integer, nullable=False)  # 1–5 scale
-    tags = db.Column(db.Text)                           # Comma-separated tags
-    impact = db.Column(db.Text)                         # Comma-separated impacts
+    tags = db.Column(JSON)                           # Comma-separated tags
+    impact = db.Column(JSON)                         # Comma-separated impacts
     note = db.Column(db.Text)                           # Optional journal entry
 
     date = db.Column(db.Date, nullable=False)
