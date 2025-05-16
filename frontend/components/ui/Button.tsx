@@ -13,6 +13,7 @@ interface Props extends PressableProps {
   title: string;
   iconEnd?: boolean;
   contentClassName?: string;
+  disabled?: boolean;
 }
 
 export function Button({
@@ -21,6 +22,8 @@ export function Button({
   className,
   contentClassName,
   iconEnd = false,
+  disabled = false,
+  onPress,
   ...rest
 }: Props) {
   function Icon(iconName: IconSymbolName) {
@@ -35,13 +38,21 @@ export function Button({
   return (
     <Pressable
       className={twMerge(
-        "active:opacity-50 flex-row items-center gap-1",
+        "flex-row items-center gap-1",
+        !disabled && "active:opacity-50",
         className,
       )}
+      onPress={disabled ? null : onPress}
       {...rest}
     >
       {!iconEnd && iconName && Icon(iconName)}
-      <Text className={twMerge("text-primary font-semibold", contentClassName)}>
+      <Text
+        className={twMerge(
+          "text-primary font-semibold",
+          contentClassName,
+          disabled && "text-base-content opacity-40",
+        )}
+      >
         {title}
       </Text>
       {iconEnd && iconName && Icon(iconName)}

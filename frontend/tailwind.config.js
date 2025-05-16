@@ -6,6 +6,7 @@ module.exports = {
     extend: {
       colors: {
         primary: "var(--color-primary)",
+        "primary-soft": "var(--color-primary-soft)",
         "primary-content": "var(--color-primary-content)",
         "base-100": "var(--color-base-100)",
         "base-200": "var(--color-base-200)",

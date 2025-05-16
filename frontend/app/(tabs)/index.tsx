@@ -1,13 +1,15 @@
-import { Platform, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PressableWithOpacity } from "@/components/PressableWithOpacity";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { MoodFace } from "@/components/ui/MoodFace";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 
-import { getCalendars } from "expo-localization";
+import { router } from "expo-router";
+import { useDateFormat } from "@/hooks/useDateFormat";
+import { MoodEntry, useMoodEntries } from "@/context/MoodEntriesContext";
 
 function ChallengeCheckbox({
   challenge,
@@ -33,11 +35,6 @@ function ChallengeCheckbox({
   );
 }
 
-interface Mood {
-  number: 1 | 2 | 3 | 4 | 5;
-  description: string[];
-}
-
 interface Challenge {
   id: number;
   text: string;
@@ -45,18 +42,35 @@ interface Challenge {
 }
 
 export default function HomeScreen() {
-  const [mood, setMood] = useState<Mood | undefined>();
+  const { moodEntries, fetchEntries } = useMoodEntries();
+
+  const [todaysEntry, setTodaysEntry] = useState<MoodEntry | undefined>();
   const [challenges, setChallenges] = useState<Challenge[]>([
     { id: 1, text: "Exercise", checked: false },
     { id: 2, text: "Stay hydrated", checked: false },
   ]);
 
-  const calendar = getCalendars()[0];
-
-  const format = new Intl.DateTimeFormat("en", {
+  const format = useDateFormat({
     dateStyle: "medium",
-    calendar: calendar.calendar ?? undefined,
   });
+
+  useEffect(() => {
+    const now = new Date();
+
+    fetchEntries(now.getFullYear(), now.getMonth() + 1)
+      .then((entries) => {
+        return entries.find(
+          (e) =>
+            e.date.getFullYear() === now.getFullYear() &&
+            e.date.getMonth() === now.getMonth() &&
+            e.date.getDate() === now.getDate(),
+        );
+      })
+      .then((todaysEntry) => {
+        if (todaysEntry) setTodaysEntry(todaysEntry);
+      });
+  }, [moodEntries]);
+
   const todayText = format.format(new Date());
 
   return (
@@ -71,7 +85,7 @@ export default function HomeScreen() {
           Today's mood
         </Text>
         <View className="bg-base-200 rounded-md justify-center items-center h-28">
-          {mood !== undefined ? (
+          {todaysEntry !== undefined ? (
             <Pressable className="opacity-100 active:opacity-70 p-6 pr-9 w-full h-full justify-center">
               <IconSymbol
                 name="chevron.right"
@@ -79,13 +93,13 @@ export default function HomeScreen() {
                 className="absolute end-4 android:end-3 text-base-content opacity-50 size-4 android:size-5"
               />
               <View className="gap-4 w-full h-full flex-row items-center">
-                <MoodFace mood={mood.number} size={52} />
+                <MoodFace mood={todaysEntry.value} size={52} />
                 <View className="shrink items-start">
                   <Text className="text-base-content text-lg font-bold">
                     {todayText}
                   </Text>
                   <Text className="text-base-content font-medium">
-                    {mood.description.join(", ")}
+                    {todaysEntry.feelings.join(", ")}
                   </Text>
                 </View>
               </View>
@@ -99,12 +113,7 @@ export default function HomeScreen() {
                 title="Record mood"
                 iconName="square.and.pencil"
                 className="p-2"
-                onPress={() =>
-                  setMood({
-                    number: 4,
-                    description: ["amazed", "relaxed", "proud"],
-                  })
-                }
+                onPress={() => router.push("/record-mood")}
               ></Button>
             </View>
           )}
