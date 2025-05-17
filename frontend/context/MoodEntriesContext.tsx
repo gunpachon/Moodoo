@@ -178,5 +178,7 @@ function generateMockData(year: number, month: number): MoodEntry[] {
   }
 
   const dates = getAllDatesInMonth(year, month - 1);
-  return dates.map((date) => generateMoodEntry(date));
+  return dates
+    .map((date) => (Math.random() < 0.2 ? undefined : generateMoodEntry(date)))
+    .filter((entry) => entry !== undefined);
 }
