@@ -82,7 +82,38 @@ def get_moods_byMonth():
             })
       return jsonify(result), 200
       
+from app.utils.models import User
+def update_user_streak(user_id):
+       # Get the latest mood log for the user
+      last_mood = Mood.query.filter_by(user_id=user_id).order_by(Mood.date.desc()).first()
+      if last_mood:
+            last_mood_date = last_mood.date
+            today = datetime.today().date()
 
+            # Check if the last mood log is from the previous day
+            if last_mood_date == today - timedelta(days=1):
+                  # Increment streak
+                  user = User.query.get(user_id)
+                  user.streak += 1
+            elif last_mood_date != today:
+                  # Reset streak if there's a break in the consecutive days
+                  user = User.query.get(user_id)
+                  user.streak = 1
+            else:
+                  # If the user logged today, do nothing to streak
+                  pass
+      else:
+            # If there is no mood log, initialize streak as 1
+            user = User.query.get(user_id)
+            user.streak = 1
+
+      # Commit the updated streak value to the database
+      try:
+            db.session.commit()
+      except Exception as e:
+            db.session.rollback()
+            print(f"Error updating streak: {str(e)}")
+      
 @mood_bp.route('/add_mood', methods=['POST'])
 @jwt_required()
 @swag_from('../../docs/add_mood.yml')
@@ -123,6 +154,7 @@ def add_mood():
       )
 
       try:
+            update_user_streak(user_id)
             db.session.add(new_mood)
             db.session.commit()
       except Exception as e:
@@ -139,7 +171,8 @@ def add_mood():
             'note': new_mood.note,
             'date': new_mood.date.isoformat(),
             'time': new_mood.time.isoformat(),
-            'created_at': new_mood.created_at.isoformat()
+            'created_at': new_mood.created_at.isoformat(),
+            'streak': User.query.get(user_id).streak
       }), 201
       
 @mood_bp.route('/update_mood', methods=['PUT'])

@@ -1,7 +1,7 @@
 tags:
   - Mood
 summary: Add a new mood entry
-description: Allows an authenticated user to add a mood entry for a specific date and time.
+description: Allows an authenticated user to add a mood entry for a specific date and time, and updates the user's streak based on consecutive mood logs.
 consumes:
   - application/json
 produces:
@@ -92,6 +92,10 @@ responses:
           type: string
           format: date-time
           example: "2025-05-16T15:31:12"
+        streak:
+          type: integer
+          description: User's current streak of consecutive mood logs
+          example: 4
   400:
     description: Missing or invalid input (e.g. mood_level, date, tags, etc.)
   401:
