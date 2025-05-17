@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/Button";
-import { MoodFace, MoodNumber } from "@/components/ui/MoodFace";
+import { MoodFace } from "@/components/ui/MoodFace";
 import { useBottomTabOverflow } from "@/components/ui/TabBarBackground.ios";
+import { MoodEntry, useMoodEntries } from "@/context/MoodEntriesContext";
 import { useDateFormat } from "@/hooks/useDateFormat";
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { twMerge } from "tailwind-merge";
@@ -22,6 +23,22 @@ export default function CalendarScreen() {
 
   const tabOverflow = useBottomTabOverflow();
   const safeAreaInsets = useSafeAreaInsets();
+
+  const { fetchEntries } = useMoodEntries();
+  const [entries, setEntries] = useState<MoodEntry[] | undefined>();
+
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    const dateToRequest = new Date(year, viewMonth, 1);
+
+    fetchEntries(
+      dateToRequest.getFullYear(),
+      dateToRequest.getMonth() + 1,
+    ).then((entries) => {
+      setEntries(entries);
+    });
+  }, [viewMonth]);
 
   return (
     <ScrollView
@@ -58,6 +75,10 @@ export default function CalendarScreen() {
 
                 const shouldShow = date > 0 && date <= lastDay.getDate();
 
+                const entry = entries?.find(
+                  (entry) => entry.date.getDate() === date,
+                );
+
                 return (
                   <View
                     className={twMerge(
@@ -67,7 +88,7 @@ export default function CalendarScreen() {
                     key={j}
                   >
                     <MoodFace
-                      mood={Math.ceil(Math.random() * 5) as MoodNumber}
+                      mood={entry?.value}
                       className="size-auto aspect-square"
                     />
                     <Text className="text-base-content text-center font-medium">
@@ -87,13 +108,23 @@ export default function CalendarScreen() {
             contentClassName="text-base-content"
             iconClassName="size-8"
             title="Prev"
-            onPress={() => setViewMonth((m) => m - 1)}
+            onPress={() =>
+              startTransition(() => {
+                setViewMonth((m) => m - 1);
+                setEntries(undefined);
+              })
+            }
           ></Button>
           {viewMonth !== month && (
             <Button
               title="Go to present"
               contentClassName="text-base-content"
-              onPress={() => setViewMonth(month)}
+              onPress={() =>
+                startTransition(() => {
+                  setViewMonth(month);
+                  setEntries(undefined);
+                })
+              }
             ></Button>
           )}
           <Button
@@ -104,7 +135,12 @@ export default function CalendarScreen() {
             iconClassName="size-8"
             title="Next"
             iconEnd={true}
-            onPress={() => setViewMonth((m) => m + 1)}
+            onPress={() =>
+              startTransition(() => {
+                setViewMonth((m) => m + 1);
+                setEntries(undefined);
+              })
+            }
           ></Button>
         </View>
 

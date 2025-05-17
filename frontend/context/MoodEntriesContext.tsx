@@ -42,7 +42,7 @@ export function MoodEntriesProvider({ children }: { children: ReactNode }) {
 
       setIsLoading(true);
 
-      const fetchedData: MoodEntry[] = [];
+      const fetchedData: MoodEntry[] = generateMockData(year, month);
       setMoodEntries((prevCache) => ({
         ...prevCache,
         [monthYearString]: fetchedData,
