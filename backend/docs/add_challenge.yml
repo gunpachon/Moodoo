@@ -1,0 +1,44 @@
+tags:
+  - Challenge
+summary: Add a new challenge entry
+description: Allows an authenticated user to add a challenge task for a specific date.
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - in: body
+    name: challenge
+    required: true
+    schema:
+      type: object
+      required:
+        - name
+        - date
+      properties:
+        name:
+          type: string
+          description: Name or title of the challenge
+          example: "Wake up early"
+        date:
+          type: string
+          format: date
+          description: "The date when the challenge should be completed (format: YYYY-MM-DD)"
+          example: "2025-05-17"
+        is_custom:
+          type: boolean
+          description: Whether the challenge is custom-created by the user
+          example: true
+responses:
+  201:
+    description: Challenge created successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Challenge created successfully
+  400:
+    description: Missing or invalid input (e.g. name or date)
+  401:
+    description: Unauthorized - missing or invalid JWT token

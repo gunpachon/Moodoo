@@ -43,5 +43,8 @@ def create_app():
     
     from app.routes.mood import mood_bp
     app.register_blueprint(mood_bp, url_prefix='/api')
+    
+    from app.routes.challenge import challenge_bp
+    app.register_blueprint(challenge_bp, url_prefix='/api')
 
     return app

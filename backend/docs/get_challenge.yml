@@ -1,0 +1,44 @@
+tags:
+  - Challenge
+summary: Retrieve challenges for a specific date
+description: Allows an authenticated user to retrieve all challenges assigned for a specific date.
+produces:
+  - application/json
+parameters:
+  - name: date
+    in: query
+    required: true
+    description: "The date to retrieve challenges (format: YYYY-MM-DD)"
+    schema:
+      type: string
+      format: date
+      example: "2025-05-17"
+responses:
+  200:
+    description: List of challenges on the specified date
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 12
+          name:
+            type: string
+            example: "Do 10 pushups"
+          date:
+            type: string
+            format: date
+            example: "2025-05-17"
+          completed:
+            type: boolean
+            example: false
+          created_at:
+            type: string
+            format: date-time
+            example: "2025-05-17T08:30:00Z"
+  400:
+    description: Missing or invalid date parameter
+  401:
+    description: Unauthorized - missing or invalid JWT token
