@@ -11,6 +11,7 @@ export const themes = {
     "--color-primary-soft": "#d7e7e4",
     "--color-base-100": colors.stone[200],
     "--color-base-200": colors.stone[100],
+    "--color-base-content-soft": colors.stone[300],
     "--color-base-content": colors.stone[900],
   },
   dark: {
@@ -21,6 +22,7 @@ export const themes = {
     "--color-primary-soft": "#1e2f2c",
     "--color-base-100": colors.stone[900],
     "--color-base-200": colors.stone[800],
+    "--color-base-content-soft": colors.stone[700],
     "--color-base-content": colors.stone[100],
   },
 };

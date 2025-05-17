@@ -4,6 +4,7 @@ from app import db
 from flasgger import swag_from
 from app.utils.models import Mood
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 mood_bp = Blueprint('mood', __name__)
 @mood_bp.route('/get_mood', methods=['GET'])
@@ -38,9 +39,56 @@ def get_mood():
 
       return jsonify(result), 200
 
-@mood_bp.route('/get_moods_byMonth', methods=['GET'])
+@mood_bp.route('/get_insight', methods=['GET'])
 @jwt_required()
-@swag_from('../../docs/get_moods_byMonth.yml')
+def get_insight():
+    try:
+        period = int(request.args.get('period'))
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid parameter format'}), 400
+
+    if period not in [1, 3, 6, 12]:
+        return jsonify({'message': 'Invalid parameter format'}), 400
+
+    end_date = datetime.today()
+    start_date = end_date - relativedelta(months=period)
+    user_id = get_jwt_identity()
+
+    moods = Mood.query.filter(
+        Mood.user_id == user_id,
+        Mood.date >= start_date.date(),
+        Mood.date <= end_date.date()
+    ).all()
+
+    if not moods:
+        return jsonify({'message': 'No moods found for the specified month'}), 404
+
+    insight = {"good": [], "bad": []}
+
+    # Categorize impacts
+    for mood in moods:
+        if mood.mood_level > 3:
+            insight['good'].extend(mood.impact)
+        elif mood.mood_level < 3:
+            insight['bad'].extend(mood.impact)
+    # Count frequencies
+
+    countGood = {"total": len(insight['good'])}
+    countBad = {"total": len(insight['bad'])}
+    
+
+    for impact in insight['good']:
+        impact = impact.strip()
+        countGood[impact] = countGood.get(impact, 0) + 1
+
+    for impact in insight['bad']:
+        impact = impact.strip()
+        countBad[impact] = countBad.get(impact, 0) + 1
+
+    return jsonify({"good": countGood, "bad": countBad}), 200
+
+
+
 def get_moods_byMonth():
       year = request.args.get('year', type=int) #expecting ?year=YYYY&month=MM
       month = request.args.get('month', type=int)

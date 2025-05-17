@@ -33,6 +33,7 @@ class Mood(db.Model):
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    
 
     def __repr__(self):
         return f"<Mood {self.id} (User {self.user_id}) - Level {self.mood_level}>"
