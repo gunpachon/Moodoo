@@ -76,12 +76,12 @@ export default function HomeScreen() {
   return (
     <View className="px-8 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 gap-4">
       <View className="mb-3">
-        <Text className="text-base-content text-xl font-bold">
+        <Text className="text-base-content text-2xl font-bold">
           What's up, Ideal!
         </Text>
       </View>
       <View>
-        <Text className="text-base-content text-xl font-bold mb-2">
+        <Text className="text-base-content text-2xl font-bold mb-2">
           Today's mood
         </Text>
         <View className="bg-base-200 rounded-md justify-center items-center h-28">
@@ -93,7 +93,7 @@ export default function HomeScreen() {
                 className="absolute end-4 android:end-3 text-base-content opacity-50 size-4 android:size-5"
               />
               <View className="gap-4 w-full h-full flex-row items-center">
-                <MoodFace mood={todaysEntry.value} size={52} />
+                <MoodFace mood={todaysEntry.value} />
                 <View className="shrink items-start">
                   <Text className="text-base-content text-lg font-bold">
                     {todayText}
@@ -120,7 +120,7 @@ export default function HomeScreen() {
         </View>
       </View>
       <View className="pt-4">
-        <Text className="text-base-content text-xl font-bold pb-2">
+        <Text className="text-base-content text-2xl font-bold pb-2">
           Challenges
         </Text>
         <View className="bg-base-200 rounded-md justify-start items-stretch px-2 py-3 gap-1">

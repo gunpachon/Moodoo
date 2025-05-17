@@ -1,5 +1,5 @@
 import { cssInterop } from "nativewind";
-import { StyleProp, View, ViewStyle } from "react-native";
+import { View } from "react-native";
 import Svg, { SvgProps, Path, G, Circle } from "react-native-svg";
 import { twMerge } from "tailwind-merge";
 
@@ -136,7 +136,7 @@ export function MoodFace({
 
   return (
     <View className={twMerge("size-16", className)}>
-      <MoodWind className={iconClassName} />
+      <MoodWind className={iconClassName} preserveAspectRatio="contain" />
     </View>
   );
 }

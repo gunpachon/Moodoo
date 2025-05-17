@@ -6,21 +6,18 @@ import "react-native-reanimated";
 
 import "../global.css";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { vars } from "nativewind";
 import { MoodEntriesProvider } from "@/context/MoodEntriesContext";
-import { darkNavigationTheme, lightNavigationTheme } from "@/constants/Themes";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/hooks/useTheme";
+import { useNavigationTheme } from "@/hooks/useNavigationTheme";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const navigationTheme =
-    colorScheme === "dark" ? darkNavigationTheme : lightNavigationTheme;
   const theme = useTheme();
+  const navigationTheme = useNavigationTheme();
 
   return (
     <ThemeProvider value={navigationTheme}>
