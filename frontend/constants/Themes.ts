@@ -5,6 +5,9 @@ import { DarkTheme, DefaultTheme, Theme } from "@react-navigation/native";
 export const themes = {
   light: {
     "--color-primary": colors.teal[600],
+    "--color-primary-content": colors.gray[100],
+    "--color-secondary": colors.cyan[700],
+    "--color-secondary-content": colors.gray[100],
     "--color-primary-soft": "#d7e7e4",
     "--color-base-100": colors.stone[200],
     "--color-base-200": colors.stone[100],
@@ -12,6 +15,9 @@ export const themes = {
   },
   dark: {
     "--color-primary": colors.teal[500],
+     "--color-primary-content": colors.gray[100],
+     "--color-secondary": colors.cyan[700],
+    "--color-secondary-content": colors.gray[100],
     "--color-primary-soft": "#1e2f2c",
     "--color-base-100": colors.stone[900],
     "--color-base-200": colors.stone[800],
