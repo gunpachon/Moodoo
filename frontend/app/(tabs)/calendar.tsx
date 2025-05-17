@@ -7,6 +7,23 @@ import { useEffect, useState, useTransition } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { twMerge } from "tailwind-merge";
+import { LineChart as _LineChart } from "react-native-gifted-charts";
+import { cssInterop } from "nativewind";
+
+const LineChart = cssInterop(_LineChart, {
+  lineClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "color",
+    },
+  },
+  pointsClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "dataPointsColor",
+    },
+  },
+});
 
 export default function CalendarScreen() {
   const date = new Date();
@@ -14,8 +31,9 @@ export default function CalendarScreen() {
   const month = date.getMonth();
 
   const monthFormat = useDateFormat({ month: "long", year: "numeric" });
+  const dayFormat = useDateFormat({ day: "numeric" });
 
-  const [viewMonth, setViewMonth] = useState(1);
+  const [viewMonth, setViewMonth] = useState(month);
   const firstDay = new Date(year, viewMonth, 1);
   const firstWeekday = firstDay.getDay();
 
@@ -106,7 +124,7 @@ export default function CalendarScreen() {
             className="px-4 py-2 bg-base-200 rounded-lg gap-0"
             textClassName="mx-2"
             contentClassName="text-base-content"
-            iconClassName="size-8"
+            iconClassName="size-6"
             title="Prev"
             onPress={() =>
               startTransition(() => {
@@ -132,7 +150,7 @@ export default function CalendarScreen() {
             className="px-4 py-2 bg-base-200 rounded-lg gap-0"
             textClassName="mx-2"
             contentClassName="text-base-content"
-            iconClassName="size-8"
+            iconClassName="size-6"
             title="Next"
             iconEnd={true}
             onPress={() =>
@@ -145,10 +163,26 @@ export default function CalendarScreen() {
         </View>
 
         <View className="mt-4">
-          <Text className="mx-6 text-base-content text-2xl font-bold mb-2">
-            Mood flow
+          <Text className="mx-6 text-base-content text-2xl font-bold mb-3">
+            Monthly trends
           </Text>
-          <View className="mx-4 h-64 bg-base-200 rounded-lg"></View>
+          <View className="mx-4 bg-base-200 rounded-lg overflow-hidden">
+            <LineChart
+              data={entries?.map((entry) => ({
+                value: entry.value - 1,
+                label: dayFormat.format(entry.date),
+              }))}
+              yAxisLabelTexts={["1", "2", "3", "4", "5"]}
+              initialSpacing={15}
+              spacing={20}
+              maxValue={4}
+              mostNegativeValue={0}
+              stepValue={1}
+              adjustToWidth={true}
+              lineClassName="text-secondary"
+              pointsClassName="text-secondary"
+            ></LineChart>
+          </View>
         </View>
       </View>
     </ScrollView>
