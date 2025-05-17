@@ -78,7 +78,7 @@ export function MoodEntriesProvider({ children }: { children: ReactNode }) {
 export const useMoodEntries = (): MoodEntriesContextType => {
   const context = useContext(MoodEntriesContext);
   if (!context) {
-    throw new Error("useMoods must be used within a MoodEntriesProvider");
+    throw new Error("useMoodEntries must be used within a MoodEntriesProvider");
   }
   return context;
 };

@@ -8,8 +8,10 @@ import { MoodFace } from "@/components/ui/MoodFace";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 
 import { router } from "expo-router";
+import * as Haptics from "expo-haptics";
 import { useDateFormat } from "@/hooks/useDateFormat";
 import { MoodEntry, useMoodEntries } from "@/context/MoodEntriesContext";
+import { useChallenges } from "@/context/ChallengesContext";
 
 function ChallengeCheckbox({
   challenge,
@@ -26,6 +28,11 @@ function ChallengeCheckbox({
       onPress={() => {
         onCheck(!checked);
       }}
+      onPressIn={() => {
+        if (process.env.EXPO_OS === "ios") {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+      }}
     >
       <View className="flex-row gap-2 items-center">
         <Checkbox checked={checked} />
@@ -35,20 +42,11 @@ function ChallengeCheckbox({
   );
 }
 
-interface Challenge {
-  id: number;
-  text: string;
-  checked: boolean;
-}
-
 export default function HomeScreen() {
   const { moodEntries, fetchEntries } = useMoodEntries();
 
   const [todaysEntry, setTodaysEntry] = useState<MoodEntry | undefined>();
-  const [challenges, setChallenges] = useState<Challenge[]>([
-    { id: 1, text: "Exercise", checked: false },
-    { id: 2, text: "Stay hydrated", checked: false },
-  ]);
+  const { challenges, setDone } = useChallenges();
 
   const format = useDateFormat({
     dateStyle: "medium",
@@ -127,17 +125,9 @@ export default function HomeScreen() {
           {challenges.map((challenge, i) => (
             <ChallengeCheckbox
               challenge={challenge.text}
-              checked={challenge.checked}
+              checked={challenge.completed}
               onCheck={(checked) => {
-                setChallenges(
-                  challenges.map((c) => {
-                    if (c.id == challenge.id) {
-                      return { ...c, checked };
-                    } else {
-                      return c;
-                    }
-                  }),
-                );
+                setDone(challenge, checked);
               }}
               key={challenge.id}
             />
@@ -148,6 +138,7 @@ export default function HomeScreen() {
             iconName="plus"
             className="px-3.5 py-2 gap-2.5"
             contentClassName="text-base-content opacity-70"
+            onPress={() => router.push("/add-challenge")}
           ></Button>
         </View>
       </View>
