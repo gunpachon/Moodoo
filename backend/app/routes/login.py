@@ -4,6 +4,7 @@ from flask_jwt_extended import create_access_token
 from app.utils.models import User
 from app import db
 from flasgger import swag_from
+from datetime import timedelta
 
 login_bp = Blueprint('login', __name__)
 
@@ -24,5 +25,5 @@ def login():
         return jsonify({"message": "Invalid username or password"}), 401
 
     # Generate JWT token
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=3))
     return jsonify(access_token=access_token), 200

@@ -1,0 +1,34 @@
+tags:
+  - Challenge
+summary: Delete a challenge
+description: Allows an authenticated user to delete a specific challenge by ID.
+produces:
+  - application/json
+parameters:
+  - in: query
+    name: id
+    required: true
+    schema:
+      type: integer
+    description: ID of the challenge to delete
+security:
+  - BearerAuth: []
+responses:
+  200:
+    description: Challenge deleted successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Challenge deleted successfully
+  400:
+    description: Missing challenge ID
+  401:
+    description: Unauthorized (missing or invalid token)
+  404:
+    description: Challenge not found or not owned by the user
+  500:
+    description: Server error while deleting the challenge

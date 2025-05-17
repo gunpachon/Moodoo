@@ -70,3 +70,51 @@ def get_challenge():
         })
 
   return jsonify(result), 200
+
+
+@challenge_bp.route('/update_challenge', methods=['PUT'])
+@jwt_required()
+@swag_from('../../docs/update_challenge.yml') 
+def update_challenge():
+    challenge_id = request.args.get('id', type=int)
+    if not challenge_id:
+        return jsonify({"message": "Challenge ID is required"}), 400
+
+    user_id = get_jwt_identity()
+    challenge = Challenge.query.filter_by(id=challenge_id, user_id=user_id).first()
+
+    if not challenge:
+        return jsonify({"message": "Challenge not found or not yours"}), 404
+
+    challenge.completed = True  # Mark as completed
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error updating challenge: {str(e)}"}), 500
+
+    return jsonify({"message": "Challenge marked as completed"}), 200
+  
+@challenge_bp.route('/delete_challenge', methods=['DELETE'])
+@jwt_required()
+@swag_from('../../docs/delete_challenge.yml') 
+def delete_challenge():
+    challenge_id = request.args.get('id', type=int)
+    if not challenge_id:
+        return jsonify({"message": "Challenge ID is required"}), 400
+
+    user_id = get_jwt_identity()
+    challenge = Challenge.query.filter_by(id=challenge_id, user_id=user_id).first()
+
+    if not challenge:
+        return jsonify({"message": "Challenge not found or not yours"}), 404
+
+    try:
+        db.session.delete(challenge)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error deleting challenge: {str(e)}"}), 500
+
+    return jsonify({"message": "Challenge deleted successfully"}), 200
