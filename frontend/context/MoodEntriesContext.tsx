@@ -11,6 +11,7 @@ export interface MoodEntry {
   feelings: string[];
   impacts: string[];
   date: Date;
+  notes?: string;
 }
 
 interface MoodEntriesCache {
