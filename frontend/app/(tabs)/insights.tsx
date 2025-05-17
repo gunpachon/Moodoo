@@ -42,7 +42,7 @@ export default function InsightsScreen() {
 
   const fetchInsights = async () => {
     try {
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0NzQ5MjY0NCwianRpIjoiNjM4MGQ3N2QtMzgxYi00YmJkLWJiNWMtNDUwN2JjZWZlMjUyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjUiLCJuYmYiOjE3NDc0OTI2NDQsImNzcmYiOiIwNDU2YzUwMC02ZTA3LTQ5ZWItYTZmZi1jYTIwM2RkYjcyNTciLCJleHAiOjE3NDc3NTE4NDR9.fQxlTImr2YwsogldMi7Z7wrPdy2WHE_tJmXMvYkd2vs'; // 🔐 Replace with real token logic
+      const token = ''; // 🔐 Replace with real token logic
       const period = periodMap[selectedPeriod];
 
       const res = await fetch(`http://172.20.10.2:5001/api/get_insight?period=${period}`, {
@@ -108,7 +108,7 @@ export default function InsightsScreen() {
             iconEnd
             onPress={() => setDropdownOpen(!dropdownOpen)}
           />
-          
+
           {dropdownOpen && (
             <View className="absolute right-0 top-12 w-28 bg-base-100 border border-base-content rounded-lg z-50 shadow">
               {periods.map((period) => (
