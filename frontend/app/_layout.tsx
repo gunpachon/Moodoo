@@ -31,9 +31,8 @@ export default function RootLayout() {
           >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
-              name="record-mood"
+              name="edit-mood"
               options={{
-                title: "Record mood",
                 presentation: "modal",
                 headerLeft: () => {
                   return (

@@ -15,9 +15,9 @@ export const themes = {
     "--color-base-content": colors.stone[900],
   },
   dark: {
-    "--color-primary": colors.teal[500],
-     "--color-primary-content": colors.gray[100],
-     "--color-secondary": colors.cyan[700],
+    "--color-primary": colors.teal[400],
+    "--color-primary-content": colors.gray[100],
+    "--color-secondary": colors.cyan[600],
     "--color-secondary-content": colors.gray[100],
     "--color-primary-soft": "#1e2f2c",
     "--color-base-100": colors.stone[900],

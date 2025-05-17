@@ -1,3 +1,4 @@
+import { sameDay } from "@/lib/utils";
 import {
   createContext,
   ReactNode,
@@ -11,6 +12,7 @@ export interface MoodEntry {
   feelings: string[];
   impacts: string[];
   date: Date;
+  notes?: string;
 }
 
 interface MoodEntriesCache {
@@ -21,7 +23,7 @@ interface MoodEntriesContextType {
   moodEntries: MoodEntriesCache;
   isLoading: boolean;
   fetchEntries: (year: number, month: number) => Promise<MoodEntry[]>;
-  addEntry: (entry: MoodEntry) => void;
+  upsertEntry: (entry: MoodEntry) => void;
 }
 
 const MoodEntriesContext = createContext<MoodEntriesContextType | null>(null);
@@ -37,7 +39,6 @@ export function MoodEntriesProvider({ children }: { children: ReactNode }) {
       const cachedData = moodEntries[monthYearString] as
         | MoodEntry[]
         | undefined;
-      console.log(moodEntries);
       if (cachedData !== undefined) return cachedData;
 
       setIsLoading(true);
@@ -55,20 +56,34 @@ export function MoodEntriesProvider({ children }: { children: ReactNode }) {
     [moodEntries],
   );
 
-  const addEntry = useCallback((entry: MoodEntry) => {
+  const upsertEntry = useCallback((entry: MoodEntry) => {
     const monthYearString = `${entry.date.getFullYear()}-${(entry.date.getMonth() + 1).toString().padStart(2, "0")}`;
 
-    setMoodEntries((prevCache) => ({
-      ...prevCache,
-      [monthYearString]: prevCache[monthYearString]
-        ? [...prevCache[monthYearString], entry]
-        : [entry],
-    }));
+    setMoodEntries((prevCache) => {
+      const monthEntries = prevCache[monthYearString] as
+        | MoodEntry[]
+        | undefined;
+
+      let newMonthEntries: MoodEntry[] = [entry];
+
+      if (monthEntries !== undefined) {
+        const filteredMonthEntries = monthEntries.filter(
+          (storedEntry) => !sameDay(storedEntry.date, entry.date),
+        );
+
+        newMonthEntries = [...filteredMonthEntries, entry];
+      }
+
+      return {
+        ...prevCache,
+        [monthYearString]: newMonthEntries,
+      };
+    });
   }, []);
 
   return (
     <MoodEntriesContext.Provider
-      value={{ moodEntries, isLoading, fetchEntries, addEntry }}
+      value={{ moodEntries, isLoading, fetchEntries, upsertEntry }}
     >
       {children}
     </MoodEntriesContext.Provider>
@@ -177,5 +192,8 @@ function generateMockData(year: number, month: number): MoodEntry[] {
   }
 
   const dates = getAllDatesInMonth(year, month - 1);
-  return dates.map((date) => generateMoodEntry(date));
+  return dates
+    .filter((date) => date < new Date())
+    .map((date) => generateMoodEntry(date))
+    .filter((_) => Math.random() > 0.2);
 }

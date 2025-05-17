@@ -116,6 +116,7 @@ export function MoodFace({
           cy="48"
           r="48"
           className="text-base-content"
+          fill={fillColor}
           fillOpacity={fillOpacity ?? 0.2}
         />
       </Svg>

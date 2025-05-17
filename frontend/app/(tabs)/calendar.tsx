@@ -7,6 +7,44 @@ import { useEffect, useState, useTransition } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { twMerge } from "tailwind-merge";
+import { LineChart as _LineChart } from "react-native-gifted-charts";
+import { cssInterop } from "nativewind";
+import { getDateURLParam, sameDay } from "@/lib/utils";
+import { PressableWithOpacity } from "@/components/PressableWithOpacity";
+import { router } from "expo-router";
+
+const LineChart = cssInterop(_LineChart, {
+  xAxisClassName: {
+    target: "xAxisLabelTextStyle",
+  },
+  yAxisClassName: {
+    target: "yAxisTextStyle",
+  },
+  yAxisLineClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "yAxisColor",
+    },
+  },
+  xAxisLineClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "xAxisColor",
+    },
+  },
+  lineClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "color",
+    },
+  },
+  pointsClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "dataPointsColor",
+    },
+  },
+});
 
 export default function CalendarScreen() {
   const date = new Date();
@@ -14,8 +52,9 @@ export default function CalendarScreen() {
   const month = date.getMonth();
 
   const monthFormat = useDateFormat({ month: "long", year: "numeric" });
+  const dayFormat = useDateFormat({ day: "numeric" });
 
-  const [viewMonth, setViewMonth] = useState(1);
+  const [viewMonth, setViewMonth] = useState(month);
   const firstDay = new Date(year, viewMonth, 1);
   const firstWeekday = firstDay.getDay();
 
@@ -28,6 +67,19 @@ export default function CalendarScreen() {
   const [entries, setEntries] = useState<MoodEntry[] | undefined>();
 
   const [isPending, startTransition] = useTransition();
+
+  const today = new Date();
+
+  const chartData: Array<MoodEntry | { value: undefined; date: Date }> = [];
+  for (let day = firstDay.getDate(); day <= lastDay.getDate(); day++) {
+    const date = new Date(year, viewMonth, day);
+    chartData.push(
+      entries?.find((entry) => sameDay(entry.date, date)) ?? {
+        value: undefined,
+        date,
+      },
+    );
+  }
 
   useEffect(() => {
     const dateToRequest = new Date(year, viewMonth, 1);
@@ -60,7 +112,7 @@ export default function CalendarScreen() {
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
               (weekday) => (
                 <Text
-                  className="grow basis-0 text-center font-bold"
+                  className="text-base-content grow basis-0 text-center font-bold"
                   key={weekday}
                 >
                   {weekday}
@@ -80,21 +132,39 @@ export default function CalendarScreen() {
                 );
 
                 return (
-                  <View
+                  <PressableWithOpacity
                     className={twMerge(
                       "grow shrink gap-1",
                       !shouldShow && "invisible",
                     )}
                     key={j}
+                    onPress={() => {
+                      router.push(
+                        entry === undefined
+                          ? `/edit-mood?dateToEdit=${getDateURLParam(new Date(year, viewMonth, date))}&adding=true`
+                          : `/edit-mood?dateToEdit=${getDateURLParam(entry.date)}`,
+                      );
+                    }}
+                    disabled={
+                      new Date(year, viewMonth, date) >=
+                      new Date(
+                        today.getFullYear(),
+                        today.getMonth(),
+                        today.getDate() + 1,
+                      )
+                    }
                   >
                     <MoodFace
                       mood={entry?.value}
                       className="size-auto aspect-square"
+                      iconClassName={
+                        entry?.value === undefined ? "opacity-10" : undefined
+                      }
                     />
                     <Text className="text-base-content text-center font-medium">
                       {date}
                     </Text>
-                  </View>
+                  </PressableWithOpacity>
                 );
               })}
             </View>
@@ -106,7 +176,7 @@ export default function CalendarScreen() {
             className="px-4 py-2 bg-base-200 rounded-lg gap-0"
             textClassName="mx-2"
             contentClassName="text-base-content"
-            iconClassName="size-8"
+            iconClassName="size-6"
             title="Prev"
             onPress={() =>
               startTransition(() => {
@@ -132,7 +202,7 @@ export default function CalendarScreen() {
             className="px-4 py-2 bg-base-200 rounded-lg gap-0"
             textClassName="mx-2"
             contentClassName="text-base-content"
-            iconClassName="size-8"
+            iconClassName="size-6"
             title="Next"
             iconEnd={true}
             onPress={() =>
@@ -145,10 +215,32 @@ export default function CalendarScreen() {
         </View>
 
         <View className="mt-4">
-          <Text className="mx-6 text-base-content text-2xl font-bold mb-2">
-            Mood flow
+          <Text className="mx-6 text-base-content text-2xl font-bold mb-3">
+            Monthly trends
           </Text>
-          <View className="mx-4 h-64 bg-base-200 rounded-lg"></View>
+          <View className="mx-4 bg-base-200 rounded-lg overflow-hidden">
+            <LineChart
+              data={chartData?.map((entry) => ({
+                value: entry?.value !== undefined ? entry.value - 1 : undefined,
+                label: dayFormat.format(entry.date),
+              }))}
+              yAxisLabelTexts={["1", "2", "3", "4", "5"]}
+              initialSpacing={15}
+              spacing={20}
+              maxValue={4}
+              mostNegativeValue={0}
+              stepValue={1}
+              adjustToWidth={true}
+              lineClassName="text-secondary"
+              pointsClassName="text-secondary"
+              xAxisClassName="text-base-content"
+              yAxisClassName="text-base-content"
+              xAxisLineClassName="text-base-content"
+              yAxisLineClassName="text-base-content"
+              showDataPointsForMissingValues={false}
+              extrapolateMissingValues={false}
+            ></LineChart>
+          </View>
         </View>
       </View>
     </ScrollView>
