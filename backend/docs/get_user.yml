@@ -1,0 +1,32 @@
+tags:
+  - User
+summary: Retrieve authenticated user's profile
+description: Returns the profile information of the currently authenticated user.
+produces:
+  - application/json
+responses:
+  200:
+    description: User profile retrieved successfully
+    schema:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        username:
+          type: string
+          example: moodmaster
+        nickname:
+          type: string
+          example: Moodie
+        streak:
+          type: integer
+          example: 14
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-11-08T10:15:30"
+  401:
+    description: Unauthorized – missing or invalid JWT token
+  404:
+    description: User not found

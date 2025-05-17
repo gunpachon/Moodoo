@@ -1,0 +1,104 @@
+tags:
+  - Mood
+summary: Update an existing mood entry
+description: Allows an authenticated user to update their existing mood entry using the mood ID.
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - name: mood_id
+    in: query
+    required: true
+    type: integer
+    description: The ID of the mood entry to update
+    example: 42
+  - in: body
+    name: mood
+    required: true
+    schema:
+      type: object
+      properties:
+        mood_level:
+          type: integer
+          description: Mood level from 1 (lowest) to 5 (highest)
+          example: 3
+        tags:
+          type: array
+          items:
+            type: string
+          description: Updated list of mood tags
+          example: ["work", "fatigue"]
+        impact:
+          type: array
+          items:
+            type: string
+          description: Updated list of impacted areas
+          example: ["sleep", "energy"]
+        note:
+          type: string
+          description: Optional updated note
+          example: "Feeling more tired than usual."
+        date:
+          type: string
+          format: date
+          description: Updated date for the mood entry
+          example: "2025-05-14"
+        time:
+          type: string
+          format: time
+          description: Updated time for the mood entry
+          example: "09:45"
+responses:
+  200:
+    description: Mood entry successfully updated
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Mood updated successfully
+        id:
+          type: integer
+          example: 42
+        user_id:
+          type: integer
+          example: 123
+        mood_level:
+          type: integer
+          example: 3
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["work", "fatigue"]
+        impact:
+          type: array
+          items:
+            type: string
+          example: ["sleep", "energy"]
+        note:
+          type: string
+          example: "Feeling more tired than usual."
+        date:
+          type: string
+          format: date
+          example: "2025-05-14"
+        time:
+          type: string
+          format: time
+          example: "09:45:00"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-05-14T08:30:00"
+  400:
+    description: Missing or invalid input (e.g. mood_id, mood_level, date, time)
+  401:
+    description: Unauthorized, missing or invalid JWT token
+  403:
+    description: Forbidden – user does not own this mood entry
+  404:
+    description: Mood entry not found
+  500:
+    description: Internal server error while updating mood

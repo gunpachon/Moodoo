@@ -1,0 +1,59 @@
+tags:
+  - Mood
+summary: Retrieve mood entries for a specific date
+description: Returns all mood entries for the authenticated user on the specified date.
+produces:
+  - application/json
+parameters:
+  - name: date
+    in: query
+    description: Date in YYYY-MM-DD format
+    required: true
+    type: string
+    example: "2025-05-15"
+responses:
+  200:
+    description: List of mood entries for the given date
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+          user_id:
+            type: integer
+            example: 123
+          mood_level:
+            type: integer
+            example: 4
+          tags:
+            type: array
+            items:
+              type: string
+            example: ["work", "stress"]
+          impact:
+            type: array
+            items:
+              type: string
+            example: ["productivity", "sleep"]
+          note:
+            type: string
+            example: "Felt a bit overwhelmed but managed to finish tasks."
+          date:
+            type: string
+            format: date
+            example: "2025-05-15"
+          time:
+            type: string
+            format: time
+            example: "14:30:00"
+          created_at:
+            type: string
+            format: date-time
+            example: "2025-05-15T14:45:23"
+  400:
+    description: Invalid or missing date parameter
+  401:
+    description: Unauthorized, missing or invalid JWT token

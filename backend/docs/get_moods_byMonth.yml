@@ -1,0 +1,67 @@
+tags:
+  - Mood
+summary: Retrieve mood entries for a specific month
+description: Returns all mood entries for the authenticated user in the specified month and year.
+produces:
+  - application/json
+parameters:
+  - name: year
+    in: query
+    description: Year in YYYY format
+    required: true
+    type: integer
+    example: 2025
+  - name: month
+    in: query
+    description: Month as a number from 1 to 12
+    required: true
+    type: integer
+    example: 5
+responses:
+  200:
+    description: List of mood entries for the given month
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 2
+          user_id:
+            type: integer
+            example: 123
+          mood_level:
+            type: integer
+            example: 3
+          tags:
+            type: array
+            items:
+              type: string
+            example: ["social", "happy"]
+          impact:
+            type: array
+            items:
+              type: string
+            example: ["energy", "focus"]
+          note:
+            type: string
+            example: "Had a great day with friends."
+          date:
+            type: string
+            format: date
+            example: "2025-05-12"
+          time:
+            type: string
+            format: time
+            example: "18:45:00"
+          created_at:
+            type: string
+            format: date-time
+            example: "2025-05-12T19:00:00"
+  400:
+    description: Missing or invalid year/month query parameters
+  401:
+    description: Unauthorized, missing or invalid JWT token
+  404:
+    description: No mood entries found for the specified month

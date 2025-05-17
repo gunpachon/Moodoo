@@ -1,0 +1,41 @@
+tags:
+  - User
+summary: Update authenticated user's nickname
+description: Allows the authenticated user to update their nickname.
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - in: body
+    name: user
+    required: true
+    schema:
+      type: object
+      required:
+        - nickname
+      properties:
+        nickname:
+          type: string
+          description: The new nickname for the user
+          example: MoodieMaster
+responses:
+  200:
+    description: Nickname updated successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Nickname updated successfully
+        nickname:
+          type: string
+          example: MoodieMaster
+  400:
+    description: Invalid or missing nickname
+  401:
+    description: Unauthorized – missing or invalid JWT token
+  404:
+    description: User not found
+  500:
+    description: Internal server error while updating nickname
