@@ -88,7 +88,8 @@ def get_insight():
     return jsonify({"good": countGood, "bad": countBad}), 200
 
 
-
+@mood_bp.route('/get_moods_byMonth', methods=['GET'])
+@jwt_required()
 def get_moods_byMonth():
       year = request.args.get('year', type=int) #expecting ?year=YYYY&month=MM
       month = request.args.get('month', type=int)
