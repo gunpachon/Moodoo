@@ -9,6 +9,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { twMerge } from "tailwind-merge";
 import { LineChart as _LineChart } from "react-native-gifted-charts";
 import { cssInterop } from "nativewind";
+import { getDateURLParam, sameDay } from "@/lib/utils";
+import { PressableWithOpacity } from "@/components/PressableWithOpacity";
+import { router } from "expo-router";
 
 const LineChart = cssInterop(_LineChart, {
   xAxisClassName: {
@@ -65,13 +68,7 @@ export default function CalendarScreen() {
 
   const [isPending, startTransition] = useTransition();
 
-  function sameDay(date1: Date, date2: Date) {
-    return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
-    );
-  }
+  const today = new Date();
 
   const chartData: Array<MoodEntry | { value: undefined; date: Date }> = [];
   for (let day = firstDay.getDate(); day <= lastDay.getDate(); day++) {
@@ -135,12 +132,27 @@ export default function CalendarScreen() {
                 );
 
                 return (
-                  <View
+                  <PressableWithOpacity
                     className={twMerge(
                       "grow shrink gap-1",
                       !shouldShow && "invisible",
                     )}
                     key={j}
+                    onPress={() => {
+                      router.push(
+                        entry === undefined
+                          ? `/edit-mood?dateToEdit=${getDateURLParam(new Date(year, viewMonth, date))}&adding=true`
+                          : `/edit-mood?dateToEdit=${getDateURLParam(entry.date)}`,
+                      );
+                    }}
+                    disabled={
+                      new Date(year, viewMonth, date) >=
+                      new Date(
+                        today.getFullYear(),
+                        today.getMonth(),
+                        today.getDate() + 1,
+                      )
+                    }
                   >
                     <MoodFace
                       mood={entry?.value}
@@ -152,7 +164,7 @@ export default function CalendarScreen() {
                     <Text className="text-base-content text-center font-medium">
                       {date}
                     </Text>
-                  </View>
+                  </PressableWithOpacity>
                 );
               })}
             </View>

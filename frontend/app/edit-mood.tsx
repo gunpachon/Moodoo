@@ -4,9 +4,10 @@ import { MoodFace, MoodNumber } from "@/components/ui/MoodFace";
 import { useMoodEntries } from "@/context/MoodEntriesContext";
 import { useDateFormat } from "@/hooks/useDateFormat";
 import { useTheme } from "@/hooks/useTheme";
-import { router, Stack } from "expo-router";
+import { sameDay } from "@/lib/utils";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { vars } from "nativewind";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PressableProps, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { twMerge } from "tailwind-merge";
@@ -105,7 +106,17 @@ const Chip = ({ text, isSelected, ...rest }: ChipProps) => {
   );
 };
 
-export default function AddChallenge() {
+export default function RecordMood() {
+  const { dateToEdit, adding } = useLocalSearchParams<{
+    dateToEdit?: string;
+    adding?: string;
+  }>();
+  const { fetchEntries } = useMoodEntries();
+
+  const isAdding = adding !== undefined || dateToEdit === undefined;
+
+  const [isLoading, setLoading] = useState(!!dateToEdit);
+
   const theme = useTheme();
 
   const [mood, setMood] = useState<MoodNumber | undefined>(undefined);
@@ -113,18 +124,58 @@ export default function AddChallenge() {
   const [impacts, setImpacts] = useState<Set<string>>(new Set());
   const [notes, setNotes] = useState<string>();
 
+  let editingDate = new Date();
+
+  if (dateToEdit) {
+    const tokens = dateToEdit.split("-");
+    if (tokens.length !== 3) throw new Error("Invalid parameter");
+    let [year, month, day] = tokens;
+
+    const yearNumber = parseInt(year);
+    const monthNumber = parseInt(month);
+    const dayNumber = parseInt(day);
+
+    if (isNaN(yearNumber) || isNaN(monthNumber) || isNaN(dayNumber))
+      throw new Error("Invalid parameter");
+
+    editingDate = new Date(yearNumber, monthNumber - 1, dayNumber);
+  }
+
+  const isToday = sameDay(editingDate, new Date());
+
+  useEffect(() => {
+    if (dateToEdit) {
+      fetchEntries(editingDate.getFullYear(), editingDate.getMonth() + 1).then(
+        (entries) => {
+          const entry = entries.find(
+            (entry) => entry.date.getDate() === editingDate.getDate(),
+          );
+
+          if (entry) {
+            setMood(entry.value);
+            setFeelings(new Set(entry.feelings));
+            setImpacts(new Set(entry.impacts));
+            setNotes(entry.notes);
+          }
+
+          setLoading(false);
+        },
+      );
+    }
+  }, []);
+
   const canSave = mood !== undefined && feelings.size > 0 && impacts.size > 0;
 
   const dateFormat = useDateFormat({
     dateStyle: "medium",
   });
 
-  const { addEntry } = useMoodEntries();
+  const { upsertEntry } = useMoodEntries();
 
   function saveMood() {
     if (!canSave) return;
 
-    addEntry({
+    upsertEntry({
       date: new Date(),
       feelings: Array.from(feelings),
       impacts: Array.from(impacts),
@@ -135,9 +186,14 @@ export default function AddChallenge() {
 
   return (
     <KeyboardAwareScrollView contentContainerClassName="justify-end pb-[env(safe-area-inset-bottom)]">
-      <View className="p-6 gap-2" style={vars(theme)}>
+      <View
+        className={twMerge("p-6 gap-2", isLoading && "opacity-30")}
+        style={vars(theme)}
+        pointerEvents={isLoading ? "none" : "auto"}
+      >
         <Stack.Screen
           options={{
+            title: isAdding ? "Add entry" : "Edit entry",
             headerRight: () => {
               return (
                 <Button
@@ -156,10 +212,10 @@ export default function AddChallenge() {
         ></Stack.Screen>
         <View className="mb-2">
           <Text className="text-base-content text-lg font-medium leading-snug">
-            {dateFormat.format(new Date())}
+            {dateFormat.format(editingDate)}
           </Text>
           <Text className="text-base-content text-2xl font-bold">
-            How was today?
+            How was {isToday ? "today" : "the day"}?
           </Text>
         </View>
         <View className="bg-base-200 p-6 rounded-lg gap-4 items-center">
@@ -203,7 +259,7 @@ export default function AddChallenge() {
           ))}
         </View>
         <Text className="mt-6 text-base-content mb-2 text-2xl font-bold">
-          Most impactful today
+          Most impactful {isToday ? "today" : "that day"}
         </Text>
         <View className="flex-row flex-wrap gap-2">
           {impactList.map((text, i) => (

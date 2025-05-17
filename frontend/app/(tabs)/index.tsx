@@ -12,6 +12,7 @@ import * as Haptics from "expo-haptics";
 import { useDateFormat } from "@/hooks/useDateFormat";
 import { MoodEntry, useMoodEntries } from "@/context/MoodEntriesContext";
 import { useChallenges } from "@/context/ChallengesContext";
+import { getDateURLParam, sameDay } from "@/lib/utils";
 
 function ChallengeCheckbox({
   challenge,
@@ -52,24 +53,19 @@ export default function HomeScreen() {
     dateStyle: "medium",
   });
 
-  useEffect(() => {
-    const now = new Date();
+  const today = new Date();
 
-    fetchEntries(now.getFullYear(), now.getMonth() + 1)
+  useEffect(() => {
+    fetchEntries(today.getFullYear(), today.getMonth() + 1)
       .then((entries) => {
-        return entries.find(
-          (e) =>
-            e.date.getFullYear() === now.getFullYear() &&
-            e.date.getMonth() === now.getMonth() &&
-            e.date.getDate() === now.getDate(),
-        );
+        return entries.find((e) => sameDay(e.date, today));
       })
       .then((todaysEntry) => {
         if (todaysEntry) setTodaysEntry(todaysEntry);
       });
   }, [moodEntries]);
 
-  const todayText = format.format(new Date());
+  const todayText = format.format(today);
 
   return (
     <View className="px-8 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 gap-4">
@@ -84,7 +80,12 @@ export default function HomeScreen() {
         </Text>
         <View className="bg-base-200 rounded-md justify-center items-center h-28">
           {todaysEntry !== undefined ? (
-            <Pressable className="opacity-100 active:opacity-70 p-6 pr-9 w-full h-full justify-center">
+            <Pressable
+              className="opacity-100 active:opacity-70 p-6 pr-9 w-full h-full justify-center"
+              onPress={() =>
+                router.push(`/edit-mood?dateToEdit=${getDateURLParam(today)}`)
+              }
+            >
               <IconSymbol
                 name="chevron.right"
                 weight="semibold"
@@ -111,7 +112,7 @@ export default function HomeScreen() {
                 title="Record mood"
                 iconName="square.and.pencil"
                 className="p-2"
-                onPress={() => router.push("/record-mood")}
+                onPress={() => router.push("/edit-mood?adding=true")}
               ></Button>
             </View>
           )}
