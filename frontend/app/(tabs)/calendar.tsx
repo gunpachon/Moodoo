@@ -92,6 +92,9 @@ export default function CalendarScreen() {
     });
   }, [viewMonth]);
 
+  const calendarRows =
+    Math.ceil((lastDay.getDate() - (7 - firstWeekday)) / 7) + 1;
+
   return (
     <ScrollView
       className="mt-[env(safe-area-inset-top)]"
@@ -120,7 +123,7 @@ export default function CalendarScreen() {
               ),
             )}
           </View>
-          {[0, 1, 2, 3, 4].map((i) => (
+          {[...new Array(calendarRows)].map((_, i) => (
             <View className="flex-row gap-4" key={i}>
               {[0, 1, 2, 3, 4, 5, 6].map((j) => {
                 const date = i * 7 + j + 1 - firstWeekday;
