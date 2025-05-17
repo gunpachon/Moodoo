@@ -38,7 +38,6 @@ export function MoodEntriesProvider({ children }: { children: ReactNode }) {
       const cachedData = moodEntries[monthYearString] as
         | MoodEntry[]
         | undefined;
-      console.log(moodEntries);
       if (cachedData !== undefined) return cachedData;
 
       setIsLoading(true);
@@ -179,6 +178,7 @@ function generateMockData(year: number, month: number): MoodEntry[] {
 
   const dates = getAllDatesInMonth(year, month - 1);
   return dates
-    .map((date) => (Math.random() < 0.2 ? undefined : generateMoodEntry(date)))
-    .filter((entry) => entry !== undefined);
+    .filter((date) => date < new Date())
+    .map((date) => generateMoodEntry(date))
+    .filter((_) => Math.random() > 0.2);
 }

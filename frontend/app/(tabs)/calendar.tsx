@@ -11,6 +11,24 @@ import { LineChart as _LineChart } from "react-native-gifted-charts";
 import { cssInterop } from "nativewind";
 
 const LineChart = cssInterop(_LineChart, {
+  xAxisClassName: {
+    target: "xAxisLabelTextStyle",
+  },
+  yAxisClassName: {
+    target: "yAxisTextStyle",
+  },
+  yAxisLineClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "yAxisColor",
+    },
+  },
+  xAxisLineClassName: {
+    target: false,
+    nativeStyleToProp: {
+      color: "xAxisColor",
+    },
+  },
   lineClassName: {
     target: false,
     nativeStyleToProp: {
@@ -47,6 +65,25 @@ export default function CalendarScreen() {
 
   const [isPending, startTransition] = useTransition();
 
+  function sameDay(date1: Date, date2: Date) {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
+
+  const chartData: Array<MoodEntry | { value: undefined; date: Date }> = [];
+  for (let day = firstDay.getDate(); day <= lastDay.getDate(); day++) {
+    const date = new Date(year, viewMonth, day);
+    chartData.push(
+      entries?.find((entry) => sameDay(entry.date, date)) ?? {
+        value: undefined,
+        date,
+      },
+    );
+  }
+
   useEffect(() => {
     const dateToRequest = new Date(year, viewMonth, 1);
 
@@ -78,7 +115,7 @@ export default function CalendarScreen() {
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
               (weekday) => (
                 <Text
-                  className="grow basis-0 text-center font-bold"
+                  className="text-base-content grow basis-0 text-center font-bold"
                   key={weekday}
                 >
                   {weekday}
@@ -108,6 +145,9 @@ export default function CalendarScreen() {
                     <MoodFace
                       mood={entry?.value}
                       className="size-auto aspect-square"
+                      iconClassName={
+                        entry?.value === undefined ? "opacity-10" : undefined
+                      }
                     />
                     <Text className="text-base-content text-center font-medium">
                       {date}
@@ -168,8 +208,8 @@ export default function CalendarScreen() {
           </Text>
           <View className="mx-4 bg-base-200 rounded-lg overflow-hidden">
             <LineChart
-              data={entries?.map((entry) => ({
-                value: entry.value - 1,
+              data={chartData?.map((entry) => ({
+                value: entry?.value !== undefined ? entry.value - 1 : undefined,
                 label: dayFormat.format(entry.date),
               }))}
               yAxisLabelTexts={["1", "2", "3", "4", "5"]}
@@ -181,6 +221,12 @@ export default function CalendarScreen() {
               adjustToWidth={true}
               lineClassName="text-secondary"
               pointsClassName="text-secondary"
+              xAxisClassName="text-base-content"
+              yAxisClassName="text-base-content"
+              xAxisLineClassName="text-base-content"
+              yAxisLineClassName="text-base-content"
+              showDataPointsForMissingValues={false}
+              extrapolateMissingValues={false}
             ></LineChart>
           </View>
         </View>
