@@ -28,6 +28,7 @@ const MAPPING = {
   "person.fill": "account",
   "flame.fill": "fire",
   "trash.fill": "trash-can",
+  "pencil.line": "pencil",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],

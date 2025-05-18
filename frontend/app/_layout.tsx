@@ -62,7 +62,6 @@ export default function RootLayout() {
                 options={{
                   title: "Add challenge",
                   presentation: "modal",
-                  headerShown: false,
                   headerLeft: () => {
                     return (
                       <Button

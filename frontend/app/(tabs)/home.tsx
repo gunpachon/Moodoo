@@ -109,7 +109,7 @@ export default function HomeScreen() {
           What's up, {name}!
         </Text>
         <View className="flex-row items-center gap-2">
-          <View className="flex-row items-center bg-base-200 px-3 py-0.5 rounded-full border border-base-content-soft">
+          <View className="flex-row items-center bg-base-200 rounded-full px-2">
             <Text className="text-base-content text-xl font-medium mx-1">
               {streak}
             </Text>

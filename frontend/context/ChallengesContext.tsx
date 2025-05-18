@@ -38,7 +38,7 @@ export function ChallengesProvider({
   date = new Date(),
   children,
 }: {
-  date: Date;
+  date?: Date;
   children: ReactNode;
 }) {
   const { token } = useAuth();

@@ -62,14 +62,13 @@ export default function Challenges({
       ) : (
         <>
           {challenges.map((challenge) => (
-            <View className="flex-row items-center">
+            <View className="flex-row items-center" key={challenge.id}>
               <ChallengeCheckbox
                 challenge={challenge.name}
                 checked={challenge.completed}
                 onCheck={(checked) => {
                   setDone(challenge, checked);
                 }}
-                key={challenge.id}
               />
               {showDelete && (
                 <Button

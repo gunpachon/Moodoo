@@ -58,24 +58,22 @@ export default function LoginScreen() {
       style={vars(theme)}
     >
       <Text className="text-4xl font-bold text-center text-base-content mb-2">
-        Welcome Back
+        Welcome back
       </Text>
-      <Text className="text-base text-center text-base-content mb-10">
-        Login to your account
+      <Text className="text-lg text-center text-base-content mb-10">
+        Log in to your account
       </Text>
 
       <View className="space-y-4">
         <TextInput
-          className="bg-base-200 text-base-content px-4 py-3 rounded-full mb-2"
+          className="bg-base-200 text-base-content px-6 py-3 rounded-full mb-2 text-lg border border-base-content-soft"
           placeholder="Username"
-          placeholderTextColor="#9ca3af"
           value={username}
           onChangeText={setUsername}
         />
         <TextInput
-          className="bg-base-200 text-base-content px-4 py-3 rounded-full mb-16"
+          className="bg-base-200 text-base-content px-6 py-3 rounded-full mb-16 text-lg border border-base-content-soft"
           placeholder="Password"
-          placeholderTextColor="#9ca3af"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -87,12 +85,19 @@ export default function LoginScreen() {
         style={vars(theme)}
         onPress={handleLogin}
       >
-        <Text className="text-secondary-content font-semibold">Log In</Text>
+        <Text className="text-secondary-content font-semibold text-lg">
+          Log in
+        </Text>
       </PressableWithOpacity>
 
       <View className="mt-6 flex-row justify-center">
-        <Text className="text-base-content">Don't have an account? </Text>
-        <Link href="/auth/signup" className="text-secondary font-medium">
+        <Text className="text-base-content text-lg">
+          Don't have an account?{" "}
+        </Text>
+        <Link
+          href="/auth/signup"
+          className="text-lg text-secondary font-medium"
+        >
           Sign up
         </Link>
       </View>

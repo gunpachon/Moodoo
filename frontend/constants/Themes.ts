@@ -31,7 +31,7 @@ export const lightNavigationTheme = {
   ...DefaultTheme,
   colors: {
     background: themes.light["--color-base-100"],
-    card: themes.light["--color-base-200"],
+    card: themes.light["--color-base-100"],
     text: themes.light["--color-base-content"],
     primary: themes.light["--color-primary"],
     border: DefaultTheme.colors.border,
@@ -43,7 +43,7 @@ export const darkNavigationTheme = {
   ...DarkTheme,
   colors: {
     background: themes.dark["--color-base-100"],
-    card: themes.dark["--color-base-200"],
+    card: themes.dark["--color-base-100"],
     text: themes.dark["--color-base-content"],
     primary: themes.dark["--color-primary"],
     border: DarkTheme.colors.border,

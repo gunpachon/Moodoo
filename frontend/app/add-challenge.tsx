@@ -1,5 +1,6 @@
 import { PressableWithOpacity } from "@/components/PressableWithOpacity";
 import { Button } from "@/components/ui/Button";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useChallenges } from "@/context/ChallengesContext";
 import { useTheme } from "@/hooks/useTheme";
 import { router } from "expo-router";
@@ -24,13 +25,13 @@ export default function addChallenge() {
 
   return (
     <ScrollView className="p-6" style={vars(theme)}>
-      <View className="flex-row justify-between items-center mb-6">
-        <Text className="text-3xl font-bold">Add a challenge</Text>
-        <Button
-          title="Cancel"
-          contentClassName="text-primary text-xl"
-          onPress={() => router.dismiss()}
-        ></Button>
+      <View className="mb-4">
+        <Text className="text-base-content text-2xl font-bold">
+          Choose from our suggestions
+        </Text>
+        <Text className="text-base-content text-lg leading-tight">
+          Or write your own!
+        </Text>
       </View>
       <View style={vars(theme)} className="gap-4">
         {[...new Array(Math.ceil(suggestions.length / 2))].map((_, i) => (
@@ -41,7 +42,7 @@ export default function addChallenge() {
 
               return (
                 <PressableWithOpacity
-                  className="bg-base-200 border border-base-content-soft h-40 basis-0 grow gap-4 rounded-lg items-start justify-end py-2 px-3"
+                  className="bg-base-200 border border-base-content-soft h-40 basis-0 grow gap-4 rounded-lg items-start justify-between py-2.5 px-3.5"
                   key={j}
                   onPress={() => {
                     let challengeText: Promise<string>;
@@ -63,10 +64,16 @@ export default function addChallenge() {
                     });
                   }}
                 >
+                  <IconSymbol
+                    name={isCustom ? "pencil.line" : "plus"}
+                    className="text-base-content mt-2 size-7"
+                  ></IconSymbol>
                   {isCustom ? (
-                    <Text className="font-semibold text-lg">Custom…</Text>
+                    <Text className="text-base-content font-semibold text-lg">
+                      Custom…
+                    </Text>
                   ) : (
-                    <Text className="font-semibold text-lg">
+                    <Text className="text-base-content font-semibold text-lg">
                       {suggestions[i * 2 + j]}
                     </Text>
                   )}

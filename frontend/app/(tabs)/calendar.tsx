@@ -148,11 +148,11 @@ export default function CalendarScreen() {
                     }}
                     disabled={
                       new Date(year, viewMonth, date) >=
-                      new Date(
-                        today.getFullYear(),
-                        today.getMonth(),
-                        today.getDate() + 1,
-                      )
+                        new Date(
+                          today.getFullYear(),
+                          today.getMonth(),
+                          today.getDate() + 1,
+                        ) && entry === undefined
                     }
                   >
                     <MoodFace

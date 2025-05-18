@@ -156,7 +156,7 @@ export default function InsightsScreen() {
             key={item.label}
             label={item.label}
             percent={item.percent}
-            color="bg-primary"
+            color="bg-teal-600"
           />
         ))}
       </View>
@@ -171,7 +171,7 @@ export default function InsightsScreen() {
             key={item.label}
             label={item.label}
             percent={item.percent}
-            color="bg-rose-800"
+            color="bg-rose-700 dark:bg-rose-600"
           />
         ))}
       </View>
