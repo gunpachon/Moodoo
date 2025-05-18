@@ -111,19 +111,20 @@ export default function RecordMood() {
     dateToEdit?: string;
     adding?: string;
   }>();
-  const { fetchEntries } = useMoodEntries();
+  const { getLoadedEntries, fetchEntries } = useMoodEntries();
 
   const isAdding = adding !== undefined || dateToEdit === undefined;
 
-  const [isLoading, setLoading] = useState(!!dateToEdit);
+  const [isLoading, setLoading] = useState(false);
 
   const theme = useTheme();
 
-  const [mood, setMood] = useState<MoodNumber | undefined>(undefined);
-  const [feelings, setFeelings] = useState<Set<string>>(new Set());
-  const [impacts, setImpacts] = useState<Set<string>>(new Set());
-  const [notes, setNotes] = useState<string>();
+  let storedMood = undefined;
+  let storedFeelings = new Set<string>();
+  let storedImpacts = new Set<string>();
+  let storedNotes = undefined;
 
+  let editingID = null;
   let editingDate = new Date();
 
   if (dateToEdit) {
@@ -139,30 +140,40 @@ export default function RecordMood() {
       throw new Error("Invalid parameter");
 
     editingDate = new Date(yearNumber, monthNumber - 1, dayNumber);
-  }
 
-  const isToday = sameDay(editingDate, new Date());
+    const entries = getLoadedEntries(
+      editingDate.getFullYear(),
+      editingDate.getMonth() + 1,
+    );
 
-  useEffect(() => {
-    if (dateToEdit) {
+    if (entries) {
+      const entry = entries.find(
+        (entry) => entry.date.getDate() === editingDate.getDate(),
+      );
+
+      if (entry) {
+        editingID = entry.id;
+        storedMood = entry.value;
+        storedFeelings = new Set(entry.feelings);
+        storedImpacts = new Set(entry.impacts);
+        storedNotes = entry.notes;
+      }
+    } else {
+      setLoading(true);
       fetchEntries(editingDate.getFullYear(), editingDate.getMonth() + 1).then(
-        (entries) => {
-          const entry = entries.find(
-            (entry) => entry.date.getDate() === editingDate.getDate(),
-          );
-
-          if (entry) {
-            setMood(entry.value);
-            setFeelings(new Set(entry.feelings));
-            setImpacts(new Set(entry.impacts));
-            setNotes(entry.notes);
-          }
-
+        () => {
           setLoading(false);
         },
       );
     }
-  }, []);
+  }
+
+  const [mood, setMood] = useState<MoodNumber | undefined>(storedMood);
+  const [feelings, setFeelings] = useState<Set<string>>(storedFeelings);
+  const [impacts, setImpacts] = useState<Set<string>>(storedImpacts);
+  const [notes, setNotes] = useState<string | undefined>(storedNotes);
+
+  const isToday = sameDay(editingDate, new Date());
 
   const canSave = mood !== undefined && feelings.size > 0 && impacts.size > 0;
 
@@ -170,19 +181,7 @@ export default function RecordMood() {
     dateStyle: "medium",
   });
 
-  const { upsertEntry } = useMoodEntries();
-
-  function saveMood() {
-    if (!canSave) return;
-
-    upsertEntry({
-      date: new Date(),
-      feelings: Array.from(feelings),
-      impacts: Array.from(impacts),
-      value: mood,
-      notes: notes?.trim() || undefined,
-    });
-  }
+  const { insertEntry, updateEntry } = useMoodEntries();
 
   return (
     <KeyboardAwareScrollView contentContainerClassName="justify-end pb-[env(safe-area-inset-bottom)]">
@@ -202,7 +201,28 @@ export default function RecordMood() {
                   contentClassName="text-lg"
                   disabled={!canSave}
                   onPress={() => {
-                    saveMood();
+                    if (!canSave) return;
+
+                    if (mood === undefined) return;
+
+                    const moodEntry = {
+                      date: editingDate,
+                      feelings: Array.from(feelings),
+                      impacts: Array.from(impacts),
+                      value: mood,
+                      notes: notes?.trim() || undefined,
+                    };
+
+                    if (isAdding) {
+                      insertEntry(moodEntry);
+                    } else {
+                      if (editingID === null)
+                        throw new Error("id must not be null here");
+                      updateEntry({
+                        id: editingID,
+                        ...moodEntry,
+                      });
+                    }
                     router.dismiss();
                   }}
                 ></Button>

@@ -44,7 +44,7 @@ function ChallengeCheckbox({
 }
 
 export default function HomeScreen() {
-  const { moodEntries, fetchEntries } = useMoodEntries();
+  const { entriesCache, fetchEntries, getLoadedEntries } = useMoodEntries();
 
   const [todaysEntry, setTodaysEntry] = useState<MoodEntry | undefined>();
   const { challenges, setDone } = useChallenges();
@@ -56,14 +56,17 @@ export default function HomeScreen() {
   const today = new Date();
 
   useEffect(() => {
-    fetchEntries(today.getFullYear(), today.getMonth() + 1)
-      .then((entries) => {
-        return entries.find((e) => sameDay(e.date, today));
-      })
-      .then((todaysEntry) => {
-        if (todaysEntry) setTodaysEntry(todaysEntry);
-      });
-  }, [moodEntries]);
+    const year = today.getFullYear();
+    const monthNumber = today.getMonth() + 1;
+    const entries = getLoadedEntries(year, monthNumber);
+
+    if (entries === undefined) {
+      fetchEntries(year, monthNumber);
+    } else {
+      const todaysEntry = entries.find((e) => sameDay(e.date, today));
+      setTodaysEntry(todaysEntry);
+    }
+  }, [entriesCache]);
 
   const todayText = format.format(today);
 

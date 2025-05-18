@@ -3,7 +3,7 @@ import { MoodFace } from "@/components/ui/MoodFace";
 import { useBottomTabOverflow } from "@/components/ui/TabBarBackground.ios";
 import { MoodEntry, useMoodEntries } from "@/context/MoodEntriesContext";
 import { useDateFormat } from "@/hooks/useDateFormat";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { twMerge } from "tailwind-merge";
@@ -63,10 +63,20 @@ export default function CalendarScreen() {
   const tabOverflow = useBottomTabOverflow();
   const safeAreaInsets = useSafeAreaInsets();
 
-  const { fetchEntries } = useMoodEntries();
-  const [entries, setEntries] = useState<MoodEntry[] | undefined>();
+  const { getLoadedEntries, fetchEntries } = useMoodEntries();
 
-  const [isPending, startTransition] = useTransition();
+  const dateToRequest = new Date(year, viewMonth, 1);
+  const entries = getLoadedEntries(
+    dateToRequest.getFullYear(),
+    dateToRequest.getMonth() + 1,
+  );
+
+  useEffect(() => {
+    console.log(`Entries for ${dateToRequest}: ${JSON.stringify(entries)}`);
+    if (entries === undefined) {
+      fetchEntries(dateToRequest.getFullYear(), dateToRequest.getMonth() + 1);
+    }
+  }, [entries]);
 
   const today = new Date();
 
@@ -80,17 +90,6 @@ export default function CalendarScreen() {
       },
     );
   }
-
-  useEffect(() => {
-    const dateToRequest = new Date(year, viewMonth, 1);
-
-    fetchEntries(
-      dateToRequest.getFullYear(),
-      dateToRequest.getMonth() + 1,
-    ).then((entries) => {
-      setEntries(entries);
-    });
-  }, [viewMonth]);
 
   const calendarRows =
     Math.ceil((lastDay.getDate() - (7 - firstWeekday)) / 7) + 1;
@@ -181,23 +180,13 @@ export default function CalendarScreen() {
             contentClassName="text-base-content"
             iconClassName="size-6"
             title="Prev"
-            onPress={() =>
-              startTransition(() => {
-                setViewMonth((m) => m - 1);
-                setEntries(undefined);
-              })
-            }
+            onPress={() => setViewMonth((m) => m - 1)}
           ></Button>
           {viewMonth !== month && (
             <Button
               title="Go to present"
               contentClassName="text-base-content"
-              onPress={() =>
-                startTransition(() => {
-                  setViewMonth(month);
-                  setEntries(undefined);
-                })
-              }
+              onPress={() => setViewMonth(month)}
             ></Button>
           )}
           <Button
@@ -208,12 +197,7 @@ export default function CalendarScreen() {
             iconClassName="size-6"
             title="Next"
             iconEnd={true}
-            onPress={() =>
-              startTransition(() => {
-                setViewMonth((m) => m + 1);
-                setEntries(undefined);
-              })
-            }
+            onPress={() => setViewMonth((m) => m + 1)}
           ></Button>
         </View>
 

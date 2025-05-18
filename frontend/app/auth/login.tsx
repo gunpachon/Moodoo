@@ -1,23 +1,28 @@
-import { View, Text, TextInput, Alert } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { PressableWithOpacity } from '@/components/PressableWithOpacity';
-import { useTheme } from '@/hooks/useTheme';
-import { vars } from 'nativewind';
+import { View, Text, TextInput, Alert } from "react-native";
+import { Link, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { PressableWithOpacity } from "@/components/PressableWithOpacity";
+import { useTheme } from "@/hooks/useTheme";
+import { vars } from "nativewind";
+import { useAuth } from "@/context/AuthContext";
+
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 export default function LoginScreen() {
   const theme = useTheme();
   const router = useRouter();
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const { token, setToken } = useAuth();
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://172.20.10.2:5001/api/login', {
-        method: 'POST',
+      const response = await fetch(`${BASE_URL}/api/login`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username,
@@ -28,23 +33,33 @@ export default function LoginScreen() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || "Login failed");
       }
 
       const token = data.access_token;
-      console.log('JWT Token:', token);
 
-      Alert.alert('Login Success');
-      router.replace('/(tabs)'); // Change to your app home route
+      setToken(token);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Something went wrong');
+      console.error(error);
+      Alert.alert("Error", error.message || "Something went wrong");
     }
   };
 
+  useEffect(() => {
+    if (token !== null) router.replace("/(tabs)"); // Change to your app home route
+  }, [token]);
+
   return (
-    <View className="flex-1 justify-center bg-base-100 px-6" style={vars(theme)}>
-      <Text className="text-4xl font-bold text-center text-base-content mb-2">Welcome Back</Text>
-      <Text className="text-base text-center text-base-content mb-10">Login to your account</Text>
+    <View
+      className="flex-1 justify-center bg-base-100 px-6"
+      style={vars(theme)}
+    >
+      <Text className="text-4xl font-bold text-center text-base-content mb-2">
+        Welcome Back
+      </Text>
+      <Text className="text-base text-center text-base-content mb-10">
+        Login to your account
+      </Text>
 
       <View className="space-y-4">
         <TextInput
