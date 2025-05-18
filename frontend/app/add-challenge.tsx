@@ -41,7 +41,7 @@ export default function addChallenge() {
 
               return (
                 <PressableWithOpacity
-                  className="bg-base-200 h-40 basis-0 grow gap-4 rounded-lg items-start justify-end py-2 px-3"
+                  className="bg-base-200 border border-base-content-soft h-40 basis-0 grow gap-4 rounded-lg items-start justify-end py-2 px-3"
                   key={j}
                   onPress={() => {
                     let challengeText: Promise<string>;

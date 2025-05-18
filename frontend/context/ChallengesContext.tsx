@@ -9,14 +9,14 @@ import {
 import { useAuth } from "./AuthContext";
 import { getYYYYMMDD } from "@/lib/utils";
 
-interface Challenge {
+export interface Challenge {
   id: number;
   name: string;
   completed: boolean;
 }
 
-interface ChallangesContextType {
-  challenges: Challenge[];
+export interface ChallangesContextType {
+  challenges: Challenge[] | undefined;
   setDone: (challenge: Challenge, completed: boolean) => void;
   addChallenge: (name: string, isCustom: boolean) => Promise<void>;
 }
@@ -33,20 +33,26 @@ const ChallengesContext = createContext<ChallangesContextType | null>(null);
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
-export function ChallengesProvider({ children }: { children: ReactNode }) {
+export function ChallengesProvider({
+  date = new Date(),
+  children,
+}: {
+  date: Date;
+  children: ReactNode;
+}) {
   const { token } = useAuth();
 
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[] | undefined>(
+    undefined,
+  );
 
   const fetchChallenges = useCallback(async () => {
-    const today = new Date();
-
     if (token === null) {
       throw new Error("Token must not be null here");
     }
 
     const response = await fetch(
-      `${BASE_URL}/api/get_challenge?date=${getYYYYMMDD(today)}`,
+      `${BASE_URL}/api/get_challenge?date=${getYYYYMMDD(date)}`,
       {
         method: "GET",
         headers: {
@@ -81,7 +87,7 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
   const setDone = useCallback(
     (challenge: Challenge, completed: boolean) => {
       setChallenges((challenges) =>
-        challenges.map((c) => {
+        challenges?.map((c) => {
           if (c.id !== challenge.id) return c;
 
           return {

@@ -1,50 +1,18 @@
-import { Alert, Modal, Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 
 import { Button } from "@/components/ui/Button";
 import { useCallback, useEffect, useState } from "react";
-import { PressableWithOpacity } from "@/components/PressableWithOpacity";
-import { Checkbox } from "@/components/ui/Checkbox";
 import { MoodFace } from "@/components/ui/MoodFace";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 
 import { router } from "expo-router";
-import * as Haptics from "expo-haptics";
 import { useDateFormat } from "@/hooks/useDateFormat";
 import { MoodEntry, useMoodEntries } from "@/context/MoodEntriesContext";
-import { useChallenges } from "@/context/ChallengesContext";
 import { getDateURLParam, sameDay } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import Challenges from "@/components/ui/Challenges";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
-
-function ChallengeCheckbox({
-  challenge,
-  checked,
-  onCheck,
-}: {
-  challenge: string;
-  checked: boolean;
-  onCheck: (checked: boolean) => void;
-}) {
-  return (
-    <PressableWithOpacity
-      className="px-3 py-2.5"
-      onPress={() => {
-        onCheck(!checked);
-      }}
-      onPressIn={() => {
-        if (process.env.EXPO_OS === "ios") {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        }
-      }}
-    >
-      <View className="flex-row gap-2 items-center">
-        <Checkbox checked={checked} />
-        <Text className="text-base-content">{challenge}</Text>
-      </View>
-    </PressableWithOpacity>
-  );
-}
 
 interface ApiResponseUserProfile {
   created_at: string;
@@ -60,7 +28,6 @@ export default function HomeScreen() {
   const { token, setToken } = useAuth();
 
   const [todaysEntry, setTodaysEntry] = useState<MoodEntry | undefined>();
-  const { challenges, setDone } = useChallenges();
 
   const format = useDateFormat({
     dateStyle: "medium",
@@ -228,25 +195,8 @@ export default function HomeScreen() {
         <Text className="text-base-content text-2xl font-bold pb-2">
           Challenges
         </Text>
-        <View className="bg-base-200 rounded-md justify-start items-stretch px-2 py-3 gap-1">
-          {challenges.map((challenge) => (
-            <ChallengeCheckbox
-              challenge={challenge.name}
-              checked={challenge.completed}
-              onCheck={(checked) => {
-                setDone(challenge, checked);
-              }}
-              key={challenge.id}
-            />
-          ))}
-
-          <Button
-            title="Add challenge"
-            iconName="plus"
-            className="px-3.5 py-2 gap-2.5"
-            contentClassName="text-base-content opacity-70"
-            onPress={() => router.push("/add-challenge")}
-          ></Button>
+        <View className="bg-base-200 rounded-md justify-start items-stretch">
+          <Challenges showAdd={true} />
         </View>
       </View>
     </View>
