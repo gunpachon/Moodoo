@@ -109,7 +109,7 @@ export default function CalendarScreen() {
         </View>
 
         <View className="gap-4 p-4 pt-2 bg-base-200 rounded-lg mx-4">
-          <View className="flex-row gap-4 py-2 border-base-100 border-b-2">
+          <View className="flex-row gap-4 py-2 border-base-content-soft border-b">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
               (weekday) => (
                 <Text
