@@ -11,6 +11,17 @@ parameters:
     schema:
       type: integer
     description: ID of the challenge to mark as completed
+  - in: body
+    name: status
+    schema:
+      type: object
+      required:
+        - completed
+      properties:
+        completed:
+          type: boolean
+          description: Whether the challenge is completed
+          example: true
 security:
   - BearerAuth: []
 responses:

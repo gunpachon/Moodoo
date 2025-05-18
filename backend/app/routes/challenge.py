@@ -79,6 +79,9 @@ def update_challenge():
     challenge_id = request.args.get('id', type=int)
     if not challenge_id:
         return jsonify({"message": "Challenge ID is required"}), 400
+    
+    data = request.get_json()
+    completed = data.get('completed', True)
 
     user_id = get_jwt_identity()
     challenge = Challenge.query.filter_by(id=challenge_id, user_id=user_id).first()
@@ -86,7 +89,7 @@ def update_challenge():
     if not challenge:
         return jsonify({"message": "Challenge not found or not yours"}), 404
 
-    challenge.completed = True  # Mark as completed
+    challenge.completed = completed  # Mark as completed
 
     try:
         db.session.commit()
