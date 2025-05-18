@@ -10,7 +10,7 @@ import { sameDay } from "@/lib/utils";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { vars } from "nativewind";
 import { useCallback, useState } from "react";
-import { PressableProps, Text, TextInput, View } from "react-native";
+import { Alert, PressableProps, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { twMerge } from "tailwind-merge";
 
@@ -195,11 +195,11 @@ export default function RecordMood() {
           : feelingDescriptions.bad;
 
   const joinSuggestions = useCallback(
-    (existing: Set<string>, suggestions: string[]) => {
+    (existing: Set<string>, suggestions: string[], current: Set<string>) => {
       const unseen = Array.from(existing).filter(
         (f) => !suggestions.includes(f),
       );
-      return [...unseen, ...suggestions];
+      return Array.from(new Set([...unseen, ...suggestions, ...current]));
     },
     [],
   );
@@ -207,9 +207,10 @@ export default function RecordMood() {
   const feelingDescriptionsToShow = joinSuggestions(
     storedFeelings,
     feelingSuggestions,
+    feelings,
   );
 
-  const impactsToShow = joinSuggestions(storedImpacts, impactList);
+  const impactsToShow = joinSuggestions(storedImpacts, impactList, impacts);
 
   return (
     <KeyboardAwareScrollView contentContainerClassName="justify-end pb-[env(safe-area-inset-bottom)]">
@@ -305,6 +306,20 @@ export default function RecordMood() {
                 }}
               />
             ))}
+            <Chip
+              text="Custom…"
+              isSelected={false}
+              key="custom"
+              onPress={() => {
+                Alert.prompt(
+                  "Custom feeling",
+                  "Record a custom feeling",
+                  (text) => {
+                    setFeelings((feelings) => new Set([...feelings, text]));
+                  },
+                );
+              }}
+            />
           </View>
           <Text className="mt-6 text-base-content mb-2 text-2xl font-bold">
             Most impactful {isToday ? "today" : "that day"}
@@ -329,6 +344,20 @@ export default function RecordMood() {
                 }}
               />
             ))}
+            <Chip
+              text="Custom…"
+              isSelected={false}
+              key="custom"
+              onPress={() => {
+                Alert.prompt(
+                  "Custom impact",
+                  "Record a custom impact",
+                  (text) => {
+                    setImpacts((impacts) => new Set([...impacts, text]));
+                  },
+                );
+              }}
+            />
           </View>
           <Text className="text-base-content text-2xl font-bold mt-6 mb-2">
             Notes
