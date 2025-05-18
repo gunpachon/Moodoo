@@ -31,6 +31,15 @@ export default function RootLayout() {
                 headerBackTitle: "Back",
               }}
             >
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="auth/login"
+                options={{ headerTransparent: true, headerTitle: "" }}
+              />
+              <Stack.Screen
+                name="auth/signup"
+                options={{ headerTransparent: true, headerTitle: "" }}
+              />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen
                 name="edit-mood"
