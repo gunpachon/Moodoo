@@ -72,7 +72,6 @@ export default function CalendarScreen() {
   );
 
   useEffect(() => {
-    console.log(`Entries for ${dateToRequest}: ${JSON.stringify(entries)}`);
     if (entries === undefined) {
       fetchEntries(dateToRequest.getFullYear(), dateToRequest.getMonth() + 1);
     }
