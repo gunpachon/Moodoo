@@ -1,7 +1,7 @@
-import { Pressable, Text, View } from "react-native";
+import { Alert, Modal, Pressable, Text, View } from "react-native";
 
 import { Button } from "@/components/ui/Button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PressableWithOpacity } from "@/components/PressableWithOpacity";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { MoodFace } from "@/components/ui/MoodFace";
@@ -13,6 +13,9 @@ import { useDateFormat } from "@/hooks/useDateFormat";
 import { MoodEntry, useMoodEntries } from "@/context/MoodEntriesContext";
 import { useChallenges } from "@/context/ChallengesContext";
 import { getDateURLParam, sameDay } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 function ChallengeCheckbox({
   challenge,
@@ -43,8 +46,18 @@ function ChallengeCheckbox({
   );
 }
 
+interface ApiResponseUserProfile {
+  created_at: string;
+  id: number;
+  nickname: string;
+  streak: number;
+  username: string;
+}
+
 export default function HomeScreen() {
   const { entriesCache, fetchEntries, getLoadedEntries } = useMoodEntries();
+
+  const { token, setToken } = useAuth();
 
   const [todaysEntry, setTodaysEntry] = useState<MoodEntry | undefined>();
   const { challenges, setDone } = useChallenges();
@@ -70,12 +83,94 @@ export default function HomeScreen() {
 
   const todayText = format.format(today);
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const [name, setName] = useState<string | undefined>(undefined);
+  const [streak, setStreak] = useState<number | undefined>(undefined);
+
+  const fetchName = useCallback(async () => {
+    const response = await fetch(`${BASE_URL}/api/get_user`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Include the JWT token
+      },
+    });
+
+    if (response.ok) {
+      const apiResponse = (await response.json()) as ApiResponseUserProfile;
+
+      setName(apiResponse.nickname);
+      setStreak(apiResponse.streak);
+    } else {
+      console.error("Failed to update name");
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchName();
+  }, [token]);
+
+  const changeName = useCallback(
+    async (newName: string) => {
+      const response = await fetch(`${BASE_URL}/api/update_user`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the JWT token
+        },
+        body: JSON.stringify({
+          nickname: newName,
+        }),
+      });
+
+      if (response.ok) {
+        fetchName();
+      } else {
+        console.error("Failed to update name");
+      }
+    },
+    [token],
+  );
+
   return (
     <View className="px-8 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 gap-4">
-      <View className="mb-3">
+      <View className="relative mb-3 justify-between flex-row items-center">
         <Text className="text-base-content text-2xl font-bold">
-          What's up, Ideal!
+          What's up, {name}!
         </Text>
+        <Button
+          iconName="person.fill"
+          contentClassName="text-base-content"
+          className="p-2"
+          iconClassName="size-6"
+          onPress={() => setDropdownOpen((o) => !o)}
+        ></Button>
+        {dropdownOpen && (
+          <View className="absolute right-0 top-12 w-40 bg-base-200 rounded-lg py-1 z-50 border border-base-content-soft shadow shadow-black/15">
+            <Button
+              title="Change name"
+              className="px-4 py-3"
+              contentClassName="text-base-content"
+              onPress={() => {
+                Alert.prompt("Change name", "Enter a new name", (newName) => {
+                  changeName(newName);
+                });
+                setDropdownOpen(false);
+              }}
+            />
+            <Button
+              title="Log out"
+              className="px-4 py-3"
+              contentClassName="text-red-500"
+              onPress={() => {
+                setToken(null);
+                if (router.canDismiss()) router.dismissAll();
+                router.replace("/");
+              }}
+            />
+          </View>
+        )}
       </View>
       <View>
         <Text className="text-base-content text-2xl font-bold mb-2">

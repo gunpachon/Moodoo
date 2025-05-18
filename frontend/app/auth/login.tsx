@@ -48,7 +48,7 @@ export default function LoginScreen() {
   useEffect(() => {
     if (token !== null) {
       router.dismissAll();
-      router.replace("/(tabs)"); // Change to your app home route
+      router.replace("/(tabs)/home"); // Change to your app home route
     }
   }, [token]);
 

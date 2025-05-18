@@ -24,7 +24,8 @@ const MAPPING = {
   "square.and.pencil": "pencil-plus",
   "arrowtriangle.left.circle.fill": "arrow-left-drop-circle",
   "arrowtriangle.right.circle.fill": "arrow-right-drop-circle",
-  "chevron.down": "chevron-down"
+  "chevron.down": "chevron-down",
+  "person.fill": "account",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],

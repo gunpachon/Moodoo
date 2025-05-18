@@ -47,14 +47,18 @@ export default function addChallenge() {
                     let challengeText: Promise<string>;
                     if (isCustom) {
                       challengeText = new Promise((res) =>
-                        Alert.prompt("Custom…", undefined, res),
+                        Alert.prompt(
+                          "Custom challenge",
+                          "Write your own challenge",
+                          res,
+                        ),
                       );
                     } else {
                       challengeText = Promise.resolve(suggestion);
                     }
 
                     challengeText.then((text) => {
-                      addChallenge(text, false);
+                      addChallenge(text, isCustom);
                       router.dismiss();
                     });
                   }}

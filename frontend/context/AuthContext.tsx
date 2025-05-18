@@ -11,7 +11,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 interface AuthContextType {
   token: string | null;
-  setToken: (token: string) => void;
+  setToken: (token: string | null) => void;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -26,8 +26,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       pathName !== "/" &&
       !pathName.startsWith("/auth/")
     ) {
-      router.dismissAll();
-      router.replace("/");
+      if (router.canDismiss()) router.dismissAll();
+      router.push("/");
     }
   }, [pathName]);
 
