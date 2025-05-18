@@ -139,38 +139,46 @@ export default function HomeScreen() {
         <Text className="text-base-content text-2xl font-bold">
           What's up, {name}!
         </Text>
-        <Button
-          iconName="person.fill"
-          contentClassName="text-base-content"
-          className="p-2"
-          iconClassName="size-6"
-          onPress={() => setDropdownOpen((o) => !o)}
-        ></Button>
-        {dropdownOpen && (
-          <View className="absolute right-0 top-12 w-40 bg-base-200 rounded-lg py-1 z-50 border border-base-content-soft shadow shadow-black/15">
-            <Button
-              title="Change name"
-              className="px-4 py-3"
-              contentClassName="text-base-content"
-              onPress={() => {
-                Alert.prompt("Change name", "Enter a new name", (newName) => {
-                  changeName(newName);
-                });
-                setDropdownOpen(false);
-              }}
-            />
-            <Button
-              title="Log out"
-              className="px-4 py-3"
-              contentClassName="text-red-500"
-              onPress={() => {
-                setToken(null);
-                if (router.canDismiss()) router.dismissAll();
-                router.replace("/");
-              }}
-            />
+        <View className="flex-row items-center gap-2">
+          <View className="flex-row items-center bg-base-200 px-3 py-0.5 rounded-full border border-base-content-soft">
+            <Text className="text-base-content text-xl font-medium mx-1">
+              {streak}
+            </Text>
+            <IconSymbol name="flame.fill" className="size-5 text-red-400" />
           </View>
-        )}
+          <Button
+            iconName="person.fill"
+            contentClassName="text-base-content"
+            className="p-2 bg-base-200 rounded-full border border-base-content-soft"
+            iconClassName="size-6"
+            onPress={() => setDropdownOpen((o) => !o)}
+          ></Button>
+          {dropdownOpen && (
+            <View className="absolute right-0 top-12 w-40 bg-base-200 rounded-lg py-1 z-50 border border-base-content-soft shadow shadow-black/15">
+              <Button
+                title="Change name"
+                className="px-4 py-3"
+                contentClassName="text-base-content"
+                onPress={() => {
+                  Alert.prompt("Change name", "Enter a new name", (newName) => {
+                    changeName(newName);
+                  });
+                  setDropdownOpen(false);
+                }}
+              />
+              <Button
+                title="Log out"
+                className="px-4 py-3"
+                contentClassName="text-red-500"
+                onPress={() => {
+                  setToken(null);
+                  if (router.canDismiss()) router.dismissAll();
+                  router.replace("/");
+                }}
+              />
+            </View>
+          )}
+        </View>
       </View>
       <View>
         <Text className="text-base-content text-2xl font-bold mb-2">
