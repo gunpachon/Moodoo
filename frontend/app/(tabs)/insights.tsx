@@ -123,11 +123,12 @@ export default function InsightsScreen() {
             iconName="chevron.down"
             contentClassName="text-base-content"
             iconEnd
+            className="bg-base-200 px-4 py-2 rounded-full border border-base-content-soft"
             onPress={() => setDropdownOpen(!dropdownOpen)}
           />
 
           {dropdownOpen && (
-            <View className="absolute right-0 top-12 w-28 bg-base-100 border border-base-content rounded-lg z-50 shadow">
+            <View className="absolute right-0 top-12 w-40 bg-base-200 rounded-xl py-1 z-50 border border-base-content-soft shadow shadow-black/15">
               {periods.map((period) => (
                 <Pressable
                   key={period.value}

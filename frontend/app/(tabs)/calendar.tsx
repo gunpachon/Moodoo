@@ -174,7 +174,7 @@ export default function CalendarScreen() {
         <View className="py-2 px-4 flex-row gap-1 justify-between">
           <Button
             iconName="arrowtriangle.left.circle.fill"
-            className="px-4 py-2 bg-base-200 rounded-lg gap-0"
+            className="px-4 py-2 bg-base-200 rounded-lg gap-0 border border-base-content-soft"
             textClassName="mx-2"
             contentClassName="text-base-content"
             iconClassName="size-6"
@@ -190,7 +190,7 @@ export default function CalendarScreen() {
           )}
           <Button
             iconName="arrowtriangle.right.circle.fill"
-            className="px-4 py-2 bg-base-200 rounded-lg gap-0"
+            className="px-4 py-2 bg-base-200 rounded-lg gap-0 border border-base-content-soft"
             textClassName="mx-2"
             contentClassName="text-base-content"
             iconClassName="size-6"
