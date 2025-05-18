@@ -19,6 +19,7 @@ export interface ChallangesContextType {
   challenges: Challenge[] | undefined;
   setDone: (challenge: Challenge, completed: boolean) => void;
   addChallenge: (name: string, isCustom: boolean) => Promise<void>;
+  deleteChallenge: (challenge: Challenge) => Promise<void>;
 }
 
 interface ApiResponseChallenge {
@@ -138,7 +139,7 @@ export function ChallengesProvider({
       if (response.ok) {
         await fetchChallenges();
       } else {
-        console.log(
+        console.error(
           "[ChallengesContext] Add request got response " + response.status,
         );
       }
@@ -146,8 +147,34 @@ export function ChallengesProvider({
     [token],
   );
 
+  const deleteChallenge = useCallback(
+    async (challenge: Challenge) => {
+      const response = await fetch(
+        `${BASE_URL}/api/delete_challenge?id=${challenge.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json", // Though GET doesn't typically need content-type, it's good practice sometimes
+            Authorization: `Bearer ${token}`, // Include the JWT token
+          },
+        },
+      );
+
+      if (response.ok) {
+        await fetchChallenges();
+      } else {
+        console.error(
+          "[ChallengesContext] Delete request got response " + response.status,
+        );
+      }
+    },
+    [token],
+  );
+
   return (
-    <ChallengesContext.Provider value={{ challenges, setDone, addChallenge }}>
+    <ChallengesContext.Provider
+      value={{ challenges, setDone, addChallenge, deleteChallenge }}
+    >
       {children}
     </ChallengesContext.Provider>
   );

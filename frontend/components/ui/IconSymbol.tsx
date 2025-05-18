@@ -27,6 +27,7 @@ const MAPPING = {
   "chevron.down": "chevron-down",
   "person.fill": "account",
   "flame.fill": "fire",
+  "trash.fill": "trash-can",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],

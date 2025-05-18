@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { PressableWithOpacity } from "../PressableWithOpacity";
 import { Checkbox } from "./Checkbox";
@@ -18,7 +18,7 @@ function ChallengeCheckbox({
 }) {
   return (
     <PressableWithOpacity
-      className="px-3 py-2.5"
+      className="px-3 py-2.5 grow"
       onPress={() => {
         onCheck(!checked);
       }}
@@ -36,8 +36,14 @@ function ChallengeCheckbox({
   );
 }
 
-export default function Challenges({ showAdd }: { showAdd: boolean }) {
-  const { challenges, setDone } = useChallenges();
+export default function Challenges({
+  showAdd,
+  showDelete = false,
+}: {
+  showAdd: boolean;
+  showDelete?: boolean;
+}) {
+  const { challenges, setDone, deleteChallenge } = useChallenges();
 
   const isLoading = challenges === undefined;
 
@@ -56,14 +62,43 @@ export default function Challenges({ showAdd }: { showAdd: boolean }) {
       ) : (
         <>
           {challenges.map((challenge) => (
-            <ChallengeCheckbox
-              challenge={challenge.name}
-              checked={challenge.completed}
-              onCheck={(checked) => {
-                setDone(challenge, checked);
-              }}
-              key={challenge.id}
-            />
+            <View className="flex-row items-center">
+              <ChallengeCheckbox
+                challenge={challenge.name}
+                checked={challenge.completed}
+                onCheck={(checked) => {
+                  setDone(challenge, checked);
+                }}
+                key={challenge.id}
+              />
+              {showDelete && (
+                <Button
+                  iconName="trash.fill"
+                  className="px-3"
+                  contentClassName="text-red-500"
+                  iconClassName="size-6"
+                  onPress={() => {
+                    Alert.alert(
+                      "Delete challenge?",
+                      `Are you sure you want to delete "${challenge.name}"?`,
+                      [
+                        {
+                          text: "Cancel",
+                          style: "cancel",
+                        },
+                        {
+                          text: "Delete",
+                          style: "destructive",
+                          onPress: () => {
+                            deleteChallenge(challenge);
+                          },
+                        },
+                      ],
+                    );
+                  }}
+                />
+              )}
+            </View>
           ))}
           {showAdd && (
             <Button

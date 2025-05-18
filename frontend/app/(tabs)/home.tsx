@@ -100,6 +100,8 @@ export default function HomeScreen() {
     [token],
   );
 
+  const [showChallengesDelete, setShowChallengesDelete] = useState(false);
+
   return (
     <View className="px-8 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 gap-4">
       <View className="relative mb-3 justify-between flex-row items-center">
@@ -192,11 +194,19 @@ export default function HomeScreen() {
         </View>
       </View>
       <View className="pt-4">
-        <Text className="text-base-content text-2xl font-bold pb-2">
-          Challenges
-        </Text>
+        <View className="flex-row justify-between items-center mb-2">
+          <Text className="text-base-content text-2xl font-bold">
+            Challenges
+          </Text>
+          <Button
+            title={showChallengesDelete ? "Done" : "Edit"}
+            contentClassName="text-lg"
+            className="px-2"
+            onPress={() => setShowChallengesDelete((d) => !d)}
+          ></Button>
+        </View>
         <View className="bg-base-200 rounded-md justify-start items-stretch">
-          <Challenges showAdd={true} />
+          <Challenges showAdd={true} showDelete={showChallengesDelete} />
         </View>
       </View>
     </View>
