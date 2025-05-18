@@ -54,11 +54,7 @@ export default function addChallenge() {
                     }
 
                     challengeText.then((text) => {
-                      addChallenge({
-                        id: Math.floor(Math.random() * 10000),
-                        text,
-                        completed: false,
-                      });
+                      addChallenge(text, false);
                       router.dismiss();
                     });
                   }}

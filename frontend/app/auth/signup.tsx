@@ -32,7 +32,7 @@ export default function SignupScreen() {
       }
 
       Alert.alert("Success", "Account created successfully");
-      router.replace("/auth/login");
+      router.push("/auth/login");
     } catch (error: any) {
       Alert.alert("Error", error.message || "Something went wrong");
     }

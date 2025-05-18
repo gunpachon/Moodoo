@@ -126,9 +126,9 @@ export default function HomeScreen() {
           Challenges
         </Text>
         <View className="bg-base-200 rounded-md justify-start items-stretch px-2 py-3 gap-1">
-          {challenges.map((challenge, i) => (
+          {challenges.map((challenge) => (
             <ChallengeCheckbox
-              challenge={challenge.text}
+              challenge={challenge.name}
               checked={challenge.completed}
               onCheck={(checked) => {
                 setDone(challenge, checked);

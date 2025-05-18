@@ -1,4 +1,11 @@
-import { createContext, ReactNode, useContext, useMemo, useState } from "react";
+import { router, usePathname } from "expo-router";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -9,6 +16,20 @@ interface AuthContextType {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authToken, setAuthToken] = useState<string | null>(null);
+
+  const pathName = usePathname();
+
+  useEffect(() => {
+    if (
+      authToken === null &&
+      pathName !== null &&
+      pathName !== "/" &&
+      !pathName.startsWith("/auth/")
+    ) {
+      router.dismissAll();
+      router.replace("/");
+    }
+  }, [pathName]);
 
   return (
     <AuthContext.Provider value={{ token: authToken, setToken: setAuthToken }}>
