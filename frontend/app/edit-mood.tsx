@@ -9,7 +9,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { sameDay } from "@/lib/utils";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { vars } from "nativewind";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { PressableProps, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { twMerge } from "tailwind-merge";
@@ -185,6 +185,32 @@ export default function RecordMood() {
 
   const { insertEntry, updateEntry } = useMoodEntries();
 
+  const feelingSuggestions =
+    mood === undefined
+      ? feelingDescriptions.neutral
+      : mood > 3
+        ? feelingDescriptions.good
+        : mood === 3
+          ? feelingDescriptions.neutral
+          : feelingDescriptions.bad;
+
+  const joinSuggestions = useCallback(
+    (existing: Set<string>, suggestions: string[]) => {
+      const unseen = Array.from(existing).filter(
+        (f) => !suggestions.includes(f),
+      );
+      return [...unseen, ...suggestions];
+    },
+    [],
+  );
+
+  const feelingDescriptionsToShow = joinSuggestions(
+    storedFeelings,
+    feelingSuggestions,
+  );
+
+  const impactsToShow = joinSuggestions(storedImpacts, impactList);
+
   return (
     <KeyboardAwareScrollView contentContainerClassName="justify-end pb-[env(safe-area-inset-bottom)]">
       <View className="p-6" style={vars(theme)}>
@@ -260,7 +286,7 @@ export default function RecordMood() {
             Describe your feeling
           </Text>
           <View className="flex-row flex-wrap gap-2">
-            {feelingDescriptions.good.map((text, i) => (
+            {feelingDescriptionsToShow.map((text, i) => (
               <Chip
                 text={text}
                 isSelected={feelings.has(text)}
@@ -284,7 +310,7 @@ export default function RecordMood() {
             Most impactful {isToday ? "today" : "that day"}
           </Text>
           <View className="flex-row flex-wrap gap-2">
-            {impactList.map((text, i) => (
+            {impactsToShow.map((text, i) => (
               <Chip
                 text={text}
                 isSelected={impacts.has(text)}
