@@ -113,8 +113,8 @@ def get_moods_byMonth():
             Mood.date >= start_date.date(),
             Mood.date <= end_date.date()
       ).all()
-      if not moods:
-            return jsonify({'message': 'No moods found for the specified month'}), 404
+      # if not moods:
+      #       return jsonify({'message': 'No moods found for the specified month'}), 404
 
       result = []
       for mood in moods:
@@ -249,7 +249,7 @@ def update_mood():
             return jsonify({'message': 'Mood not found'}), 404
       
       user_id = get_jwt_identity()
-      if mood.user_id != user_id:
+      if str(mood.user_id) != user_id:
             return jsonify({'message': 'Unauthorized'}), 403
 
       if mood_level is not None:
